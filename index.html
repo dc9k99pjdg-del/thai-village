@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>หมู่บ้านวัฒนธรรมไทย</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E6ECE4; --surface:#FBFAF5; --ink:#2B2118; --muted:#6B5E50;
+  --wood:#7A3B1E; --gold:#B8901F; --land:#BFCF92; --land2:#B3C585;
+  --water:#5E9799; --water2:#4F8789; --line:#D3CBBB; --ok:#4E6B2A; --warn:#9A3B22;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1B201C; --surface:#262B26; --ink:#EFE8DC; --muted:#B5AA9A;
+    --wood:#C9774D; --gold:#D9B44A; --land:#5C6B3C; --land2:#52613A;
+    --water:#356A6C; --water2:#2C5C5E; --line:#3E453D; --ok:#A8C77A; --warn:#E08A6A;
+    color-scheme: dark;
+  }
+  :root:not([data-theme="light"]) .board.s0{--land:#6A6638;--land2:#5F5B31}
+  :root:not([data-theme="light"]) .board.s1{--land:#4F6B36;--land2:#46612F}
+  :root:not([data-theme="light"]) .board.s2{--land:#56604A;--land2:#4C5641}
+}
+:root[data-theme="dark"]{
+  --bg:#1B201C; --surface:#262B26; --ink:#EFE8DC; --muted:#B5AA9A;
+  --wood:#C9774D; --gold:#D9B44A; --land:#5C6B3C; --land2:#52613A;
+  --water:#356A6C; --water2:#2C5C5E; --line:#3E453D; --ok:#A8C77A; --warn:#E08A6A;
+  color-scheme: dark;
+}
+:root[data-theme="dark"] .board.s0{--land:#6A6638;--land2:#5F5B31}
+:root[data-theme="dark"] .board.s1{--land:#4F6B36;--land2:#46612F}
+:root[data-theme="dark"] .board.s2{--land:#56604A;--land2:#4C5641}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Sarabun",-apple-system,"Thonburi",sans-serif;font-size:17px;line-height:1.6;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:560px;margin:0 auto;padding:14px 14px 24px}
+h1{font-family:"Mitr","Sarabun",sans-serif;font-weight:600;font-size:1.6rem;line-height:1.2;margin:4px 0 2px;color:var(--wood)}
+.sub{margin:0;color:var(--muted);font-size:.95rem}
+.hidden{display:none!important}
+.regions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.region{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:12px 8px;font:inherit;color:var(--ink);cursor:pointer;text-align:center;min-height:150px}
+.region svg{width:56px;height:56px}
+.region b{font-family:"Mitr",sans-serif;font-weight:500;font-size:1.15rem;color:var(--wood)}
+.region small{color:var(--muted);font-size:.8rem;line-height:1.35}
+.region:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.topbar h1{font-size:1.35rem}
+.mini{font:inherit;font-family:"Mitr",sans-serif;font-size:.85rem;padding:6px 12px;border-radius:8px;border:2px solid var(--wood);background:transparent;color:var(--wood);cursor:pointer;min-height:40px}
+.season{margin:10px 0 8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.season-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.season b{font-family:"Mitr",sans-serif;font-weight:500;font-size:1.05rem}
+.season span{color:var(--muted);font-size:.85rem}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .9s linear}
+.mission{margin-top:6px;font-size:.88rem;color:var(--ink)}
+.mission.done{color:var(--ok)}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:5px 6px}
+.stat b{font-family:"Mitr",sans-serif;font-weight:500;font-size:1.1rem;display:block;line-height:1.2}
+.stat span{color:var(--muted);font-size:.72rem}
+.stat.low b{color:var(--warn)}
+.board{--land:#BFCF92;--land2:#B3C585;position:relative;display:grid;grid-template-columns:repeat(8,1fr);gap:2px;background:var(--line);border:3px solid var(--wood);border-radius:6px;overflow:hidden;touch-action:manipulation}
+.board.s0{--land:#CDCB8C;--land2:#C2C080}
+.board.s1{--land:#A8C67E;--land2:#9CBA72}
+.board.s2{--land:#BAC8A4;--land2:#AEBC98}
+.tile{position:relative;aspect-ratio:1;background:var(--land);border:0;padding:0;margin:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .6s}
+.tile:nth-child(odd){background:var(--land2)}
+.tile.water{background:var(--water)}
+.tile.water:nth-child(odd){background:var(--water2)}
+.tile.water::after{content:"";position:absolute;left:18%;right:18%;top:48%;height:2px;border-radius:2px;background:rgba(255,255,255,.28)}
+.tile.bonus{box-shadow:inset 0 0 0 3px var(--gold)}
+.tile.broken svg{opacity:.4;filter:grayscale(1)}
+.btn.alert{background:var(--warn);border-color:var(--warn)}
+.panel textarea{width:100%;min-height:90px;font:inherit;font-size:1rem;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.harm{color:var(--warn)}
+.rtable{width:100%;border-collapse:collapse;font-size:.88rem;margin:8px 0 12px}
+.rtable th,.rtable td{border:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+.rtable th{background:color-mix(in srgb,var(--gold) 14%,var(--surface));font-family:"Mitr",sans-serif;font-weight:500}
+.rtable td:nth-child(3),.rtable td:nth-child(4),.rtable td:nth-child(5){white-space:nowrap}
+.rtable td.pass{color:var(--ok);font-weight:600}.rtable td.fail{color:var(--warn);font-weight:600}.rtable td.none{color:var(--muted)}
+.report{background:var(--surface);border:2px solid var(--wood);border-radius:12px;padding:14px 14px 10px;margin:12px 0}
+.report h2{font-family:"Mitr",sans-serif;font-weight:500;font-size:1.25rem;margin:0 0 4px;color:var(--wood)}
+.report h3{font-family:"Mitr",sans-serif;font-weight:500;font-size:1rem;margin:12px 0 4px}
+.report p{margin:0 0 6px}
+.sumbox{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.sumbox div{border:1px solid var(--line);border-radius:8px;padding:6px;text-align:center}
+.sumbox b{display:block;font-family:"Mitr",sans-serif;font-size:1.2rem}
+.tile svg{width:88%;height:88%;position:relative;z-index:1}
+.tile:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.float{position:absolute;left:50%;top:10%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;font-weight:600;background:var(--surface);color:var(--ink);border-radius:6px;padding:0 5px;z-index:5;pointer-events:none;animation:up 1.4s ease-out forwards;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+@keyframes up{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-26px)}}
+.layer{position:absolute;inset:3px;pointer-events:none;z-index:3}
+.walker{position:absolute;width:9px;height:9px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--wood);border:2px solid var(--surface);transition:left 2.8s linear,top 2.8s linear}
+.boat{position:absolute;left:-12%;width:10%;height:8%;top:65%;animation:sail 16s linear infinite}
+.boat svg{width:100%;height:100%}
+.boat.b2{animation-delay:-8s;top:68%}
+@keyframes sail{from{left:-12%}to{left:102%}}
+.fx{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .5s}
+.fx.flood{opacity:1;background:linear-gradient(to bottom,transparent 49%,rgba(60,120,155,.6) 51%,rgba(60,120,155,.6) 86%,transparent 88%)}
+.fx.cold{opacity:1;background:rgba(205,228,248,.6)}
+.fx.drought{opacity:1;background:rgba(190,140,60,.5)}
+.fx.storm{opacity:1;background:repeating-linear-gradient(115deg,rgba(110,140,175,.5) 0 3px,transparent 3px 12px)}
+@media (prefers-reduced-motion: reduce){
+  .float{animation:fade 1.4s linear forwards}@keyframes fade{from{opacity:1}to{opacity:0}}
+  .bar i,.walker,.tile,.fx{transition:none}
+  .boat{animation:none;left:30%}.boat.b2{left:65%}
+}
+.status{min-height:1.6em;margin:10px 2px 6px;font-size:.95rem;color:var(--muted)}
+.status.warn{color:var(--warn)}
+.status.ok{color:var(--ok)}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tool{display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:6px 3px;color:var(--ink);font:inherit;font-size:.78rem;line-height:1.25;cursor:pointer;min-height:84px;text-align:center}
+.tool svg{width:32px;height:32px}
+.tool small{color:var(--muted)}
+.tool[aria-pressed="true"]{border-color:var(--wood);background:color-mix(in srgb,var(--gold) 16%,var(--surface))}
+.tool:focus-visible,.btn:focus-visible,.mini:focus-visible,.opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;gap:8px;margin-top:12px}
+.btn{flex:1;font:inherit;font-family:"Mitr",sans-serif;font-size:.95rem;padding:10px;border-radius:10px;border:2px solid var(--wood);background:var(--wood);color:#fff;cursor:pointer;min-height:48px}
+.btn.ghost{background:transparent;color:var(--wood)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.82rem}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.overlay.show{display:flex}
+.panel{background:var(--surface);color:var(--ink);border-radius:14px;max-width:460px;width:100%;max-height:85vh;overflow:auto;padding:20px 20px 16px;border-top:6px solid var(--gold)}
+.panel h2{font-family:"Mitr",sans-serif;font-weight:500;font-size:1.25rem;margin:0 0 4px;color:var(--wood)}
+.panel h3{font-family:"Mitr",sans-serif;font-weight:500;font-size:1.02rem;margin:16px 0 6px}
+.panel .from{color:var(--muted);font-size:.85rem;margin:0 0 8px}
+.panel p{margin:0 0 10px}
+.panel ul{margin:0 0 12px;padding-left:1.2em}
+.panel label{display:block;font-size:.9rem;margin:8px 0 2px}
+.panel input,.panel select{width:100%;font:inherit;font-size:1rem;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.actions{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.card b{font-family:"Mitr",sans-serif;font-weight:500}
+.card.locked{color:var(--muted);border-style:dashed}
+.card p{margin:2px 0 0;font-size:.95rem}
+.count{color:var(--muted);font-size:.9rem}
+.opts{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.opt{font:inherit;text-align:left;padding:10px 12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;min-height:46px}
+.opt[aria-pressed="true"]{border-color:var(--wood);background:color-mix(in srgb,var(--gold) 18%,var(--surface))}
+.orow{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;padding:6px 8px;margin-bottom:6px}
+.orow span{flex:1}
+.orow button{font:inherit;width:40px;height:40px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.mrow{margin-bottom:8px}
+.ind{color:var(--muted);font-size:.8rem}
+.stars{font-size:2.2rem;letter-spacing:4px;color:var(--gold);margin:4px 0 8px}
+.stars .off{color:var(--line)}
+.sheet{border:2px solid var(--wood);border-radius:10px;padding:10px 12px;margin:8px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="menu">
+    <h1>หมู่บ้านวัฒนธรรมไทย</h1>
+    <p class="sub">สร้างหมู่บ้าน เรียนรู้วัฒนธรรมทั้งวัตถุธรรมและอวัตถุธรรม ครบ 4 ภาค</p>
+    <div class="regions" id="regions"></div>
+    <button class="btn" id="reportBtn">ผลโหมดภารกิจ</button>
+    <p class="sub">แตะภาคที่ต้องการ แล้วเลือกโหมดอิสระหรือโหมดภารกิจ</p>
+  </section>
+
+  <section id="report" class="hidden"></section>
+
+  <section id="game" class="hidden">
+    <div class="topbar">
+      <div><h1 id="gTitle"></h1><p class="sub" id="gMode"></p></div>
+      <button class="mini" id="menuBtn">เมนู</button>
+    </div>
+    <div class="season">
+      <div class="season-top"><b id="seasonName"></b><span id="seasonLeft"></span></div>
+      <div class="bar"><i id="seasonBar"></i></div>
+      <div class="mission" id="missionLine"></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="mat">0</b><span>วัสดุ</span></div>
+      <div class="stat"><b id="pop">0</b><span>ชาวบ้าน</span></div>
+      <div class="stat" id="happyBox"><b id="happy">0</b><span>ความสุข</span></div>
+      <div class="stat" id="cultBox"><b id="cult">0</b><span>วัฒนธรรม</span></div>
+      <div class="stat" id="trustBox"><b id="trust">0</b><span>ความไว้ใจ</span></div>
+    </div>
+    <div class="board s0" id="board" role="grid" aria-label="พื้นที่หมู่บ้าน 8 คูณ 8 ช่อง">
+    </div>
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="tools" id="tools"></div>
+    <div class="row"><button class="btn ghost" id="probBtn">ปัญหาชุมชน</button></div>
+    <div class="row">
+      <button class="btn" id="bookBtn">สมุดภาพ</button>
+      <button class="btn ghost" id="goalBtn">เป้าหมาย</button>
+      <button class="btn ghost" id="resetBtn">เริ่มใหม่</button>
+    </div>
+  </section>
+
+  <footer id="foot">ลิขสิทธิ์ นายพลพิพัฒน์ ทิพยไชย และเพจสื่อและแผน</footer>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
+  <div class="panel"><div id="panelBody"></div><div class="actions" id="panelActions"></div></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var COLS=8, ROWS=8, CANAL_ROW=5, ACT_GOAL=5, SEASON_SEC=40, SEASONS=9, POP_PER_HOME=4;
+var PREFIX="tv-full-v1-";
+/* ใส่ชื่อผู้ได้รับสิทธิ์ใช้งานระหว่างเครื่องหมายคำพูดด้านล่าง */
+var LICENSEE="";
+
+var BASE={
+  hut:{cost:5,gain:2,every:6,home:true},
+  home:{cost:15,gain:2,every:6,home:true},
+  stage:{cost:15,gain:3,every:7,need:"play"},
+  market:{cost:20,gain:5,every:8,need:"trade"},
+  craft:{cost:20,gain:4,every:8},
+  sala:{cost:30,gain:6,every:9,need:"merit"},
+  wat:{cost:40,gain:8,every:10,need:"merit"},
+  mall:{cost:20,gain:10,every:6,need:"trade",tempt:true}
+};
+var ORDER=["hut","home","stage","market","craft","sala","wat","mall"];
+var DI={
+ bodhi:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="18" y="22" width="4" height="13" fill="#6B4423"/><circle cx="20" cy="15" r="11" fill="#4E7A2E"/><circle cx="13" cy="19" r="6" fill="#5E8C38"/><circle cx="27" cy="19" r="6" fill="#5E8C38"/><path d="M20 6 Q23 9 20 12 Q17 9 20 6Z" fill="#8DB85A"/><rect x="11" y="34" width="18" height="3" fill="#C9B48A"/></svg>',
+ pier:'<svg viewBox="0 0 40 40" aria-hidden="true"><g fill="#8A5A2E" stroke="#5A3A1A"><rect x="4" y="8" width="16" height="4"/><rect x="4" y="13" width="16" height="4"/><rect x="4" y="18" width="16" height="4"/></g><line x1="6" y1="22" x2="6" y2="30" stroke="#5A3A1A" stroke-width="2"/><line x1="18" y1="22" x2="18" y2="30" stroke="#5A3A1A" stroke-width="2"/><path d="M20 28 Q29 35 38 28 L36 31 Q29 35 22 31 Z" fill="#7A3B1E"/></svg>',
+ gate:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="16" width="5" height="20" fill="#F3EEE3" stroke="#8C7A5C"/><rect x="28" y="16" width="5" height="20" fill="#F3EEE3" stroke="#8C7A5C"/><path d="M5 17 L20 6 L35 17 Z" fill="#9A2E1F" stroke="#5A1A10"/><path d="M12 22 Q20 14 28 22" stroke="#B8901F" stroke-width="2" fill="none"/><path d="M20 6 L20 2" stroke="#B8901F" stroke-width="1.6"/></svg>',
+ shrine:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="18" y="22" width="4" height="13" fill="#E8E1D2" stroke="#8C7A5C"/><rect x="11" y="13" width="18" height="10" fill="#F3EEE3" stroke="#8C7A5C"/><path d="M8 14 L20 5 L32 14 Z" fill="#B8901F" stroke="#7A5E12"/><rect x="17" y="16" width="6" height="6" fill="#9A2E1F"/><rect x="12" y="35" width="16" height="2" fill="#8C7A5C"/></svg>',
+ puta:'<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="27" cy="11" r="9" fill="#4E7A2E"/><rect x="26" y="16" width="3" height="19" fill="#6B4423"/><rect x="11" y="24" width="3" height="11" fill="#7A3B1E"/><rect x="6" y="17" width="13" height="8" fill="#C08A55" stroke="#5A2A12"/><path d="M4 18 L12.5 11 L21 18 Z" fill="#7A3B1E" stroke="#4A1F0B"/></svg>',
+ umbrack:'<svg viewBox="0 0 40 40" aria-hidden="true"><line x1="4" y1="34" x2="36" y2="34" stroke="#7A6440" stroke-width="2"/><path d="M4 26 Q11 14 18 26 Z" fill="#C2452D"/><path d="M14 30 Q21 18 28 30 Z" fill="#2E6F73"/><path d="M22 24 Q29 12 36 24 Z" fill="#E0A82E"/></svg>',
+ tung:'<svg viewBox="0 0 40 40" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="37" stroke="#6B4423" stroke-width="2"/><line x1="12" y1="5" x2="28" y2="5" stroke="#6B4423" stroke-width="1.6"/><path d="M16 5 L26 5 L26 30 L21 34 L16 30 Z" fill="#C2452D"/><path d="M16 12 L26 12 M16 19 L26 19 M16 26 L26 26" stroke="#E0A82E" stroke-width="1.6"/></svg>',
+ lantern:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M2 8 Q20 16 38 8" stroke="#6B4423" stroke-width="1.4" fill="none"/><g fill="#E0A82E" stroke="#9A6A12"><path d="M8 12 L12 12 L14 18 L10 24 L6 18 Z"/><path d="M18 14 L22 14 L24 20 L20 26 L16 20 Z"/><path d="M28 12 L32 12 L34 18 L30 24 L26 18 Z"/></g><g stroke="#C2452D" stroke-width="1.2"><line x1="10" y1="24" x2="10" y2="29"/><line x1="20" y1="26" x2="20" y2="31"/><line x1="30" y1="24" x2="30" y2="29"/></g></svg>',
+ silkrack:'<svg viewBox="0 0 40 40" aria-hidden="true"><line x1="5" y1="8" x2="5" y2="36" stroke="#6B4423" stroke-width="2"/><line x1="35" y1="8" x2="35" y2="36" stroke="#6B4423" stroke-width="2"/><line x1="5" y1="9" x2="35" y2="9" stroke="#6B4423" stroke-width="2"/><rect x="8" y="10" width="7" height="18" fill="#9A2E1F"/><rect x="17" y="10" width="7" height="22" fill="#2E6F73"/><rect x="26" y="10" width="7" height="16" fill="#B8901F"/></svg>',
+ tiang:'<svg viewBox="0 0 40 40" aria-hidden="true"><g stroke="#6B4423" stroke-width="2"><line x1="10" y1="22" x2="10" y2="36"/><line x1="30" y1="22" x2="30" y2="36"/></g><rect x="8" y="21" width="24" height="3" fill="#A8643A"/><path d="M4 18 L20 6 L36 18 Z" fill="#C9A85A" stroke="#7A6440"/><path d="M4 36 L36 36" stroke="#6E9A3A" stroke-width="3"/></svg>',
+ kajood:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="30" width="32" height="5" fill="#D8C9A0"/><g stroke-width="2"><line x1="8" y1="30" x2="10" y2="10" stroke="#9C7A3A"/><line x1="13" y1="30" x2="14" y2="8" stroke="#B89A55"/><line x1="18" y1="30" x2="18" y2="10" stroke="#9A2E1F"/><line x1="23" y1="30" x2="22" y2="8" stroke="#B89A55"/><line x1="28" y1="30" x2="26" y2="10" stroke="#2E6F73"/><line x1="33" y1="30" x2="30" y2="11" stroke="#9C7A3A"/></g></svg>',
+ shade:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="18" y="20" width="4" height="15" fill="#6B4423"/><ellipse cx="20" cy="14" rx="16" ry="10" fill="#4E7A2E"/><rect x="6" y="30" width="10" height="2" fill="#8A5A2E"/><rect x="24" y="30" width="10" height="2" fill="#8A5A2E"/></svg>',
+ ruapra:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M3 28 Q20 38 37 28 L33 33 Q20 37 7 33 Z" fill="#7A3B1E"/><rect x="12" y="20" width="16" height="8" fill="#E0A82E" stroke="#9A6A12"/><path d="M14 20 L20 6 L26 20 Z" fill="#C2452D" stroke="#7A2A1A"/><path d="M20 6 L20 2" stroke="#B8901F" stroke-width="1.6"/><g stroke="#E8D7A8" stroke-width="1"><line x1="3" y1="28" x2="1" y2="22"/><line x1="37" y1="28" x2="39" y2="22"/></g></svg>'
+};
+var DECO_ALL={
+ d_bodhi:{name:"ต้นโพธิ์",icon:"bodhi",cost:10,fact:"ต้นโพธิ์เป็นต้นไม้ที่พระพุทธเจ้าประทับตรัสรู้ ชาวพุทธจึงนิยมปลูกไว้ในวัด",unlock:{streak:true},hint:"ตอบคำถามถูกติดกัน 3 ข้อ"},
+ d_pier:{name:"ท่าน้ำและเรือพาย",icon:"pier",cost:20,water:true,fact:"ท่าน้ำเป็นที่ขึ้นลงเรือของบ้านริมคลอง และเป็นที่ซักล้างของชาวบ้าน",unlock:{set:"c_river"},hint:"ทำชุดหมู่บ้านชุมชนริมน้ำ"},
+ d_gate:{name:"ซุ้มประตูวัด",icon:"gate",cost:20,fact:"ซุ้มประตูเป็นทางเข้าวัด มักประดับลวดลายปูนปั้นหรือไม้แกะสลัก",unlock:{set:"c_wat"},hint:"ทำชุดหมู่บ้านวัดกับลานชุมชน"},
+ d_shrine:{name:"ศาลพระภูมิ",icon:"shrine",cost:15,fact:"ชาวไทยตั้งศาลพระภูมิตามความเชื่อว่าพระภูมิคุ้มครองบ้านและที่ดิน",unlock:{card:"belief"},hint:"ได้บัตรความเชื่อ"},
+ d_umbrack:{name:"ราวตากร่ม",icon:"umbrack",cost:20,fact:"ร่มที่ลงสีแล้วต้องนำไปตากแดดให้แห้งก่อนนำไปขาย",unlock:{set:"n_umb"},hint:"ทำชุดหมู่บ้านทำร่ม"},
+ d_tung:{name:"ตุง",icon:"tung",cost:20,fact:"ตุงเป็นธงของล้านนา ใช้ประดับในงานบุญและพิธีกรรม",unlock:{set:"n_wat"},hint:"ทำชุดหมู่บ้านงานวัดล้านนา"},
+ d_lantern:{name:"โคมยี่เป็ง",icon:"lantern",cost:15,fact:"ช่วงยี่เป็ง ชาวล้านนาแขวนโคมหน้าบ้านและในวัดเพื่อบูชาพระรัตนตรัย",unlock:{card:"fest1"},hint:"จัดงานยี่เป็ง"},
+ d_silkrack:{name:"ราวตากผ้าไหม",icon:"silkrack",cost:20,fact:"เส้นไหมและผ้าที่ย้อมสีแล้วต้องนำไปตากให้แห้ง",unlock:{set:"e_weave"},hint:"ทำชุดหมู่บ้านทอผ้า"},
+ d_tiang:{name:"เถียงนา",icon:"tiang",cost:20,fact:"เถียงนาคือเพิงพักกลางทุ่งนา ใช้พักผ่อนและเฝ้านาของชาวอีสาน",unlock:{set:"e_merit"},hint:"ทำชุดหมู่บ้านงานบุญหมู่บ้าน"},
+ d_puta:{name:"ศาลปู่ตา",icon:"puta",cost:15,fact:"ชาวอีสานตั้งศาลปู่ตาตามความเชื่อว่าผีปู่ตาคุ้มครองคนในหมู่บ้าน",unlock:{card:"belief"},hint:"ได้บัตรความเชื่อ"},
+ d_kajood:{name:"ลานตากกระจูด",icon:"kajood",cost:20,fact:"ต้นกระจูดต้องนำมาตากแดดและย้อมสีก่อนนำไปจักสาน",unlock:{set:"s_mat"},hint:"ทำชุดหมู่บ้านชุมชนจักสาน"},
+ d_shade:{name:"ร่มต้นไม้ลานวัด",icon:"shade",cost:20,fact:"ร่มไม้ในลานวัดเป็นที่พักและที่พบปะของชาวบ้านในวันงานบุญ",unlock:{set:"s_shadow"},hint:"ทำชุดหมู่บ้านหนังตะลุงงานวัด"},
+ d_ruapra:{name:"เรือพระ",icon:"ruapra",cost:15,fact:"เรือพระตกแต่งอย่างสวยงามเพื่ออัญเชิญพระพุทธรูปในประเพณีชักพระ",unlock:{card:"fest1"},hint:"จัดงานชักพระ"}
+};
+Object.keys(DECO_ALL).forEach(function(k){BASE[k]={cost:DECO_ALL[k].cost,gain:0,every:0,deco:true,water:!!DECO_ALL[k].water};});
+function craftWith(minHome,needMarket){return state.grid.some(function(c,i){if(!c||c.type!=="craft")return false;var nh=nb(i).filter(function(j){return state.grid[j]&&state.grid[j].type==="home";}).length;return nh>=minHome&&(!needMarket||adjType(i,"market"));});}
+var SETS={
+ central:[{id:"c_river",name:"ชุมชนริมน้ำ",cond:"เรือนไทย 3 หลังติดคลอง และตลาดน้ำติดเรือนไทย",check:function(){var n=0;state.grid.forEach(function(c,i){if(c&&c.type==="home"&&adjWater(i))n++;});return n>=3&&pairs("market","home")>0;},card:{t:"ชุมชนริมน้ำ",b:"ชุมชนภาคกลางตั้งบ้านเรือนเรียงริมแม่น้ำลำคลอง ใช้เรือสัญจรและค้าขาย"}},
+  {id:"c_wat",name:"วัดกับลานชุมชน",cond:"ศาลาการเปรียญติดวัด และลานกีฬาพื้นบ้านติดวัด",check:function(){return pairs("sala","wat")>0&&pairs("stage","wat")>0;},card:{t:"วัดกับลานชุมชน",b:"ลานวัดเป็นที่จัดงานบุญและการละเล่นของชุมชน"}}],
+ north:[{id:"n_umb",name:"หมู่บ้านทำร่ม",cond:"เรือนกาแล 2 หลังติดบ้านทำร่ม",check:function(){return craftWith(2,false);},card:{t:"หมู่บ้านทำร่ม",b:"ร่มเป็นงานหัตถกรรมที่ทำกันในครัวเรือน แล้วนำไปขายในกาด"}},
+  {id:"n_wat",name:"งานวัดล้านนา",cond:"ลานฟ้อนเล็บติดวัด และกาดติดวัด",check:function(){return pairs("stage","wat")>0&&pairs("market","wat")>0;},card:{t:"งานวัดล้านนา",b:"งานบุญที่วัดมีทั้งการฟ้อนและการค้าขายของชาวบ้าน"}}],
+ northeast:[{id:"e_weave",name:"หมู่บ้านทอผ้า",cond:"กี่ทอผ้าที่ติดทั้งเรือนเกยและตลาดชุมชน",check:function(){return craftWith(1,true);},card:{t:"หมู่บ้านทอผ้า",b:"ชาวอีสานทอผ้าไหมใต้ถุนเรือน แล้วนำผ้าไปขายในตลาดชุมชน"}},
+  {id:"e_merit",name:"งานบุญหมู่บ้าน",cond:"ลานหมอลำติดวัด และศาลาการเปรียญติดวัด",check:function(){return pairs("stage","wat")>0&&pairs("sala","wat")>0;},card:{t:"งานบุญหมู่บ้าน",b:"งานบุญอีสานมีทั้งพิธีที่วัดและการแสดงหมอลำให้ชาวบ้านชม"}}],
+ south:[{id:"s_mat",name:"ชุมชนจักสาน",cond:"เรือนปั้นหยา 2 หลังติดบ้านจักสานกระจูด",check:function(){return craftWith(2,false);},card:{t:"ชุมชนจักสาน",b:"การจักสานกระจูดเป็นงานในครัวเรือนและกลุ่มแม่บ้านของชุมชน"}},
+  {id:"s_shadow",name:"หนังตะลุงงานวัด",cond:"โรงหนังตะลุงติดวัด",check:function(){return pairs("stage","wat")>0;},card:{t:"หนังตะลุงงานวัด",b:"หนังตะลุงมักแสดงในงานวัด ให้ชาวบ้านชมหลังงานบุญ"}}]
+};
+var DECO_BY={central:["d_pier","d_gate","d_shrine","d_bodhi"],north:["d_umbrack","d_tung","d_lantern","d_bodhi"],northeast:["d_silkrack","d_tiang","d_puta","d_bodhi"],south:["d_kajood","d_shade","d_ruapra","d_bodhi"]};
+var TRAD=["home","stage","market","craft","sala","wat"];
+var CARD_KEYS=["homePlace","homeHazard","wat","sala","market","food","stage","music","craft","dress","fest0","fest1","belief","speech"];
+
+var I={
+  hut:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="22" width="24" height="14" fill="#C9B48A" stroke="#7A6440" stroke-width="1.2"/><rect x="17" y="27" width="6" height="9" fill="#7A6440"/><path d="M5 23 L20 14 L35 23 Z" fill="#9C8B6A" stroke="#5E513A" stroke-width="1.2"/><line x1="4" y1="36.5" x2="36" y2="36.5" stroke="#5E513A" stroke-width="1.4"/></svg>',
+  homeC:'<svg viewBox="0 0 40 40" aria-hidden="true"><g stroke="#5A2A12" stroke-width="1.6"><line x1="11" y1="26" x2="11" y2="36"/><line x1="20" y1="26" x2="20" y2="36"/><line x1="29" y1="26" x2="29" y2="36"/></g><rect x="9" y="18" width="22" height="9" fill="#A8643A" stroke="#5A2A12" stroke-width="1.2"/><rect x="17" y="20" width="6" height="7" fill="#5A2A12"/><path d="M4 19 L20 3 L36 19 Z" fill="#7A3B1E" stroke="#4A1F0B" stroke-width="1.2"/><path d="M20 3 L18 1 M20 3 L22 1" stroke="#B8901F" stroke-width="1.6"/></svg>',
+  homeN:'<svg viewBox="0 0 40 40" aria-hidden="true"><g stroke="#5A2A12" stroke-width="1.6"><line x1="11" y1="28" x2="11" y2="36"/><line x1="29" y1="28" x2="29" y2="36"/></g><path d="M10 19 L30 19 L32 28 L8 28 Z" fill="#A8643A" stroke="#5A2A12" stroke-width="1.2"/><rect x="17.5" y="21" width="5" height="7" fill="#5A2A12"/><path d="M5 20 L20 9 L35 20 Z" fill="#7A3B1E" stroke="#4A1F0B" stroke-width="1.2"/><path d="M14 13 L25 2 M26 13 L15 2" stroke="#B8901F" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  homeNE:'<svg viewBox="0 0 40 40" aria-hidden="true"><g stroke="#5A2A12" stroke-width="1.6"><line x1="8" y1="24" x2="8" y2="36"/><line x1="20" y1="24" x2="20" y2="36"/><line x1="33" y1="27" x2="33" y2="36"/></g><rect x="6" y="15" width="16" height="10" fill="#A8643A" stroke="#5A2A12" stroke-width="1.2"/><path d="M3 16 L14 5 L25 16 Z" fill="#7A3B1E" stroke="#4A1F0B" stroke-width="1.2"/><rect x="22" y="22" width="13" height="4" fill="#C08A55" stroke="#5A2A12"/><path d="M21 22 L36 22 L33 17 L22 17 Z" fill="#8A4A24" stroke="#4A1F0B"/><line x1="10" y1="32" x2="18" y2="32" stroke="#B8901F" stroke-width="2"/></svg>',
+  homeS:'<svg viewBox="0 0 40 40" aria-hidden="true"><g fill="#BFB6A4" stroke="#6E6658"><rect x="8" y="33" width="5" height="3"/><rect x="18" y="33" width="5" height="3"/><rect x="28" y="33" width="5" height="3"/></g><g stroke="#5A2A12" stroke-width="1.6"><line x1="10.5" y1="26" x2="10.5" y2="33"/><line x1="20.5" y1="26" x2="20.5" y2="33"/><line x1="30.5" y1="26" x2="30.5" y2="33"/></g><rect x="8" y="17" width="25" height="10" fill="#A8643A" stroke="#5A2A12" stroke-width="1.2"/><rect x="17.5" y="19" width="6" height="8" fill="#5A2A12"/><path d="M4 18 L12 8 L29 8 L37 18 Z" fill="#7A3B1E" stroke="#4A1F0B" stroke-width="1.2"/></svg>',
+  wat:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="31" width="26" height="5" fill="#E8E1D2" stroke="#8C7A5C"/><rect x="10" y="21" width="20" height="10" fill="#F3EEE3" stroke="#8C7A5C"/><rect x="17" y="24" width="6" height="7" fill="#7A3B1E"/><path d="M5 22 L20 12 L35 22 Z" fill="#9A2E1F" stroke="#5A1A10"/><path d="M10 14 L20 5 L30 14 Z" fill="#B8901F" stroke="#7A5E12"/><path d="M5 22 L3 19 M35 22 L37 19 M10 14 L8 11 M30 14 L32 11 M20 5 L20 1" stroke="#B8901F" stroke-width="1.6" fill="none"/></svg>',
+  sala:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="32" width="28" height="4" fill="#C9B48A" stroke="#7A6440"/><g fill="#7A3B1E"><rect x="9" y="19" width="3" height="13"/><rect x="18.5" y="19" width="3" height="13"/><rect x="28" y="19" width="3" height="13"/></g><path d="M3 20 L20 7 L37 20 Z" fill="#8A4A24" stroke="#4A1F0B"/><path d="M3 20 L1 17 M37 20 L39 17" stroke="#B8901F" stroke-width="1.6"/></svg>',
+  boat:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M3 22 Q20 34 37 22 L33 27 Q20 33 7 27 Z" fill="#7A3B1E" stroke="#4A1F0B"/><circle cx="13" cy="22" r="3" fill="#E0A82E"/><circle cx="19" cy="21" r="3" fill="#6E9A3A"/><circle cx="25" cy="22" r="3" fill="#C2452D"/><path d="M14 18 L26 18 L23 10 L17 10 Z" fill="#E8D7A8" stroke="#8C7A5C"/><line x1="29" y1="12" x2="35" y2="26" stroke="#5A2A12" stroke-width="1.6"/></svg>',
+  smallboat:'<svg viewBox="0 0 40 20" aria-hidden="true"><path d="M2 8 Q20 20 38 8 L34 13 Q20 18 6 13 Z" fill="#7A3B1E"/><circle cx="20" cy="6" r="3" fill="#E8D7A8"/></svg>',
+  stall:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="22" width="26" height="4" fill="#8A4A24"/><line x1="9" y1="26" x2="9" y2="36" stroke="#5A2A12" stroke-width="1.6"/><line x1="31" y1="26" x2="31" y2="36" stroke="#5A2A12" stroke-width="1.6"/><circle cx="14" cy="20" r="2.6" fill="#E0A82E"/><circle cx="20" cy="20" r="2.6" fill="#6E9A3A"/><circle cx="26" cy="20" r="2.6" fill="#C2452D"/><path d="M5 8 L35 8 L33 15 L7 15 Z" fill="#E8D7A8" stroke="#8C7A5C"/><g fill="#C2452D"><path d="M9 8 L13 8 L12.5 15 L8.5 15 Z"/><path d="M18 8 L22 8 L22 15 L18 15 Z"/><path d="M27 8 L31 8 L31.5 15 L27.5 15 Z"/></g></svg>',
+  field:'<svg viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="24" rx="16" ry="11" fill="#D8C9A0" stroke="#8C7A5C"/><g fill="#7A3B1E"><circle cx="12" cy="20" r="2.4"/><circle cx="18" cy="26" r="2.4"/><circle cx="24" cy="21" r="2.4"/><circle cx="29" cy="27" r="2.4"/></g><path d="M12 20 L18 26 L24 21 L29 27" stroke="#7A3B1E" stroke-width="1.2" fill="none"/></svg>',
+  stage:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="28" width="30" height="5" fill="#C9B48A" stroke="#7A6440"/><line x1="7" y1="14" x2="7" y2="28" stroke="#7A3B1E" stroke-width="2"/><line x1="33" y1="14" x2="33" y2="28" stroke="#7A3B1E" stroke-width="2"/><path d="M3 15 L20 6 L37 15 Z" fill="#9A2E1F" stroke="#5A1A10"/><circle cx="20" cy="18" r="2.6" fill="#B8901F"/><path d="M20 21 L20 26 M15 21 L25 23 M20 26 L17 28 M20 26 L23 28" stroke="#B8901F" stroke-width="1.6"/></svg>',
+  shadow:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="30" width="30" height="5" fill="#C9B48A" stroke="#7A6440"/><rect x="7" y="9" width="26" height="21" fill="#F4F0E4" stroke="#7A3B1E" stroke-width="2"/><path d="M17 27 L18 19 L16 16 L19 13 L21 15 L20 19 L23 27 Z" fill="#3A2A1E"/><line x1="21" y1="16" x2="27" y2="12" stroke="#3A2A1E" stroke-width="1.4"/></svg>',
+  vase:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M14 6 L26 6 L24 11 Q32 17 28 29 L12 29 Q8 17 16 11 Z" fill="#F3EEE3" stroke="#8C7A5C"/><path d="M12 17 L28 17 M11 23 L29 23" stroke="#C2452D" stroke-width="2"/><path d="M13 20 L27 20" stroke="#2E6F73" stroke-width="1.6"/><path d="M14 26 L26 26" stroke="#B8901F" stroke-width="1.6"/><rect x="9" y="29" width="22" height="5" fill="#8A4A24"/></svg>',
+  umbrella:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 20 Q20 2 36 20 Z" fill="#C2452D" stroke="#7A2A1A"/><path d="M20 6 L20 20 M12 9 L16 20 M28 9 L24 20" stroke="#E8D7A8" stroke-width="1"/><line x1="20" y1="20" x2="20" y2="34" stroke="#5A2A12" stroke-width="1.8"/><path d="M20 34 Q20 37 17 36" stroke="#5A2A12" stroke-width="1.8" fill="none"/></svg>',
+  loom:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="9" width="28" height="23" fill="none" stroke="#7A3B1E" stroke-width="2"/><g stroke="#B8901F" stroke-width="1"><line x1="10" y1="9" x2="10" y2="32"/><line x1="14" y1="9" x2="14" y2="32"/><line x1="18" y1="9" x2="18" y2="32"/><line x1="22" y1="9" x2="22" y2="32"/><line x1="26" y1="9" x2="26" y2="32"/><line x1="30" y1="9" x2="30" y2="32"/></g><rect x="6" y="19" width="28" height="9" fill="#9A2E1F"/><path d="M8 24 L12 21 L16 24 L20 21 L24 24 L28 21 L32 24" stroke="#E8D7A8" stroke-width="1.2" fill="none"/><line x1="4" y1="35" x2="36" y2="35" stroke="#7A3B1E" stroke-width="2"/></svg>',
+  mat:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="10" width="28" height="22" rx="2" fill="#C9B07A" stroke="#7A6440"/><g stroke="#8C6A3A" stroke-width="2"><line x1="6" y1="15" x2="34" y2="15"/><line x1="6" y1="21" x2="34" y2="21"/><line x1="6" y1="27" x2="34" y2="27"/></g><g stroke="#E0CFA0" stroke-width="2"><line x1="12" y1="10" x2="12" y2="32"/><line x1="20" y1="10" x2="20" y2="32"/><line x1="28" y1="10" x2="28" y2="32"/></g></svg>',
+  mall:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="12" width="30" height="24" fill="#9FB3C2" stroke="#4E6070" stroke-width="1.2"/><rect x="5" y="8" width="30" height="5" fill="#C2452D" stroke="#7A2A1A"/><g fill="#E9F0F5"><rect x="9" y="16" width="5" height="5"/><rect x="17.5" y="16" width="5" height="5"/><rect x="26" y="16" width="5" height="5"/><rect x="9" y="24" width="5" height="5"/><rect x="26" y="24" width="5" height="5"/></g><rect x="17" y="27" width="6" height="9" fill="#4E6070"/></svg>',
+  erase:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 26 L22 12 L32 22 L22 32 L14 32 Z" fill="#E8D7A8" stroke="#7A6440" stroke-width="1.4"/><path d="M8 26 L14 32" stroke="#9A3B22" stroke-width="2"/><line x1="6" y1="35" x2="34" y2="35" stroke="#7A6440" stroke-width="1.4"/></svg>'
+};
+
+var SALA_CARD={t:"ศาลาการเปรียญ",b:"อาคารโถงในวัด ชาวบ้านใช้ฟังธรรม ทำบุญ และประชุมงานส่วนรวม เดิมเป็นที่เล่าเรียนพระปริยัติธรรม พระที่สอบได้เปรียญธรรมตั้งแต่ 3 ประโยคขึ้นไปเรียกว่า พระเปรียญ"};
+
+var R_ALL={
+ central:{
+  name:"ภาคกลาง", seasons:["ฤดูร้อน","ฤดูฝน","ฤดูหนาว"],
+  icon:"homeC",
+  hazard:{phase:1,name:"น้ำหลาก",fx:"flood",title:"น้ำหลากเข้าหมู่บ้าน",when:"ปลายฤดูฝน",
+    forecast:["น้ำจะหลากเล็กน้อย","น้ำจะหลากปานกลาง","น้ำจะหลากหนัก"],
+    safe:"รอดทั้งหมด เพราะยกใต้ถุนสูง น้ำไหลผ่านใต้ถุนได้"},
+  names:{hut:"บ้านติดพื้น",home:"เรือนไทยภาคกลาง",market:"ตลาดน้ำ",stage:"ลานกีฬาพื้นบ้าน",craft:"โรงเบญจรงค์"},
+  acts:{hut:"ทำงานในบ้าน",home:"ทำงานใต้ถุนเรือน",wat:"ทำบุญ",sala:"ฟังธรรม",market:"ค้าขายทางเรือ",stage:"เล่นรีรีข้าวสาร",craft:"เขียนลายเบญจรงค์",mall:"ขายของในห้าง"},
+  icons:{home:"homeC",market:"boat",stage:"field",craft:"vase"},
+  marketWater:true, riverBonus:true,
+  cards:{
+   homePlace:{t:"ใต้ถุนสูง",b:"ภาคกลางเป็นที่ราบลุ่มแม่น้ำ น้ำหลากเกือบทุกปี เรือนไทยจึงยกใต้ถุนสูงให้น้ำไหลผ่านได้ ยามน้ำลด ใต้ถุนใช้เก็บของและเป็นที่ทำงาน"},
+   homeHazard:{t:"รอดน้ำหลาก",b:"เมื่อน้ำหลาก น้ำไหลผ่านใต้ถุนเรือนได้ เรือนจึงไม่เสียหาย หลังคาทรงสูงชันช่วยให้น้ำฝนไหลลงเร็ว ชายคายื่นยาวกันแดดและฝน"},
+   wat:{t:"วัด ศูนย์กลางชุมชน",b:"วัดเป็นที่ประกอบพิธีทางศาสนาและที่พบปะของชาวบ้าน ในอดีตเป็นที่เรียนหนังสือของเด็ก คำว่า บวร มาจากบ้าน วัด โรงเรียน สามสถาบันที่ร่วมกันพัฒนาชุมชน"},
+   sala:SALA_CARD,
+   market:{t:"ตลาดน้ำ",b:"ภาคกลางมีแม่น้ำและลำคลองมาก ชาวบ้านใช้เรือเดินทางและขนสินค้า ตลาดจึงเกิดบนน้ำ เช่น ตลาดน้ำดำเนินสะดวก จังหวัดราชบุรี และตลาดน้ำอัมพวา จังหวัดสมุทรสงคราม"},
+   food:{t:"อาหารภาคกลาง",b:"ภาคกลางมีอาหารหลากรส เช่น ต้มยำที่ใช้ตะไคร้ ข่า ใบมะกรูด และแกงเขียวหวานที่ใช้กะทิ"},
+   stage:{t:"การละเล่นพื้นบ้าน",b:"การละเล่นพื้นบ้านเล่นเป็นกลุ่ม ฝึกความสามัคคีและการเคารพกติกา เช่น รีรีข้าวสาร มอญซ่อนผ้า ชักเย่อ"},
+   music:{t:"วงปี่พาทย์",b:"วงปี่พาทย์ใช้เครื่องตีและเครื่องเป่าเป็นหลัก เช่น ระนาด ฆ้องวง และปี่ ใช้บรรเลงในงานพิธีและงานบุญ"},
+   craft:{t:"เครื่องเบญจรงค์",b:"เครื่องเบญจรงค์เป็นเครื่องปั้นดินเผาที่เขียนลวดลายด้วยสีหลัก 5 สี คำว่า เบญจ แปลว่า ห้า"},
+   dress:{t:"โจงกระเบน",b:"โจงกระเบนเป็นการนุ่งผ้าโดยม้วนชายผ้าลอดหว่างขาไปเหน็บไว้ด้านหลัง ในอดีตนุ่งได้ทั้งชายและหญิง"},
+   fest0:{t:"สงกรานต์",b:"สงกรานต์ตรงกับวันที่ 13–15 เมษายน เป็นวันขึ้นปีใหม่ไทยแบบดั้งเดิม ลูกหลานรดน้ำขอพรผู้ใหญ่เพื่อแสดงความกตัญญู ทำบุญ และก่อเจดีย์ทรายเข้าวัด"},
+   fest1:{t:"ลอยกระทง",b:"ลอยกระทงจัดในคืนวันเพ็ญเดือน 12 เพื่อขอขมาพระแม่คงคาที่ได้ใช้น้ำ กระทงควรทำจากวัสดุธรรมชาติ เช่น ใบตอง หยวกกล้วย เพื่อไม่ให้น้ำเน่าเสีย"},
+   belief:{t:"ทำบุญขึ้นบ้านใหม่",b:"เมื่อสร้างบ้านเสร็จ ชาวบ้านนิมนต์พระมาสวดเจริญพุทธมนต์เพื่อความเป็นสิริมงคล หลายบ้านตั้งศาลพระภูมิตามความเชื่อว่าพระภูมิคุ้มครองบ้าน"},
+   speech:{t:"คำสุภาพ",b:"การพูดลงท้ายด้วย ครับ หรือ ค่ะ แสดงความสุภาพและให้เกียรติผู้ฟัง เป็นมารยาทในการสื่อสารของคนไทย"}
+  },
+  beliefTrigger:"newhome", beliefHint:"ทำบุญขึ้นบ้านใหม่เมื่อสร้างเรือนหลังแรก",
+  speechTrigger:"values", speechHint:"เลือกได้ถูกต้องในสถานการณ์ด้านมารยาท",
+  festivals:[
+   {name:"สงกรานต์",phase:0,ok:["รดน้ำขอพรผู้ใหญ่","ก่อเจดีย์ทรายเข้าวัด","ทำบุญตักบาตร"],bad:[["ปล่อยโคมลอย","เป็นของประเพณียี่เป็งภาคเหนือ"],["จุดบั้งไฟขอฝน","เป็นของบุญบั้งไฟภาคอีสาน"]]},
+   {name:"ลอยกระทง",phase:2,ok:["ทำกระทงจากใบตองและหยวกกล้วย","ลอยกระทงขอขมาพระแม่คงคา"],bad:[["ทำกระทงจากโฟม","โฟมย่อยสลายยาก ทำให้น้ำเสีย"],["รดน้ำขอพรผู้ใหญ่","เป็นของสงกรานต์"]]}
+  ],
+  extraEvents:["dryCanal"],
+  questions:[
+   {type:"choice",q:"ทำไมเรือนไทยภาคกลางจึงยกใต้ถุนสูง",a:["ให้น้ำที่หลากมาไหลผ่านใต้ถุนได้","เพื่อให้มองเห็นวิวได้ไกล","เพื่อกันหิมะ"]},
+   {type:"choice",q:"ทำไมภาคกลางจึงมีตลาดน้ำ",a:["มีแม่น้ำลำคลองมาก ชาวบ้านใช้เรือเดินทางและขนสินค้า","ไม่มีที่ดินให้สร้างตลาด","กฎหมายบังคับให้ขายของบนน้ำ"]},
+   {type:"choice",q:"คำว่า เบญจ ในเครื่องเบญจรงค์ แปลว่าอะไร",a:["ห้า","สาม","ทอง"]},
+   {type:"choice",q:"กระทงควรทำจากวัสดุใด",a:["ใบตองหรือหยวกกล้วย เพราะย่อยสลายได้","โฟม เพราะลอยได้นาน","พลาสติก เพราะมีสีสวย"]},
+   {type:"match",q:"จับคู่ให้ถูกต้อง",pairs:[["ตลาดน้ำดำเนินสะดวก","ราชบุรี"],["ตลาดน้ำอัมพวา","สมุทรสงคราม"],["ศาลาการเปรียญ","ฟังธรรมและประชุม"]]},
+   {type:"order",q:"เรียงลำดับการเล่นรีรีข้าวสาร",items:["สองคนจับมือกันเป็นซุ้ม","คนอื่นเกาะเอวเดินลอดซุ้มพร้อมร้องเพลง","เพลงจบ ซุ้มลดมือลงจับคนที่อยู่ใต้ซุ้ม"]},
+   {type:"choice",q:"หมู่บ้านมีถนนตัดผ่าน ชาวบ้านเลิกใช้เรือ ตลาดน้ำเงียบลง แนวทางใดทั้งอนุรักษ์และปรับตัวได้ดีที่สุด",a:["พัฒนาตลาดน้ำเป็นแหล่งท่องเที่ยวเชิงวัฒนธรรมที่ชุมชนเป็นเจ้าของ","ปิดตลาดน้ำแล้วสร้างห้างแทน","ห้ามสร้างถนนทุกกรณี"],ind:"ส 2.1 ม.4–6/5"},
+   {type:"choice",q:"ปัจจัยใดส่งผลต่อรูปแบบเรือนไทยภาคกลางมากที่สุด",a:["ภูมิประเทศที่ราบลุ่ม และภูมิอากาศร้อนฝนชุก","ความนิยมจากต่างประเทศ","ราคาไม้ในตลาด"],ind:"ส 4.3 ม.4–6/3"},
+   {type:"choice",q:"การรดน้ำขอพรผู้ใหญ่ในวันสงกรานต์ สะท้อนค่านิยมใด",a:["ความกตัญญู","ความประหยัด","การแข่งขัน"]},
+   {type:"choice",q:"วงปี่พาทย์ใช้เครื่องดนตรีประเภทใดเป็นหลัก",a:["เครื่องตีและเครื่องเป่า","เครื่องสีอย่างเดียว","เครื่องดีดอย่างเดียว"]}
+  ]
+ },
+ north:{
+  name:"ภาคเหนือ", seasons:["ฤดูร้อน","ฤดูฝน","ฤดูหนาว"],
+  icon:"homeN",
+  hazard:{phase:2,name:"อากาศหนาว",fx:"cold",title:"อากาศหนาวจัด",when:"ปลายฤดูหนาว",
+    forecast:["อากาศจะหนาวเล็กน้อย","อากาศจะหนาวปานกลาง","อากาศจะหนาวจัด"],
+    safe:"อยู่ได้ทั้งหมด เพราะฝาเรือนทึบ หน้าต่างไม่มาก ช่วยเก็บความอบอุ่น"},
+  names:{hut:"บ้านฝาโปร่ง",home:"เรือนกาแล",market:"กาด",stage:"ลานฟ้อนเล็บ",craft:"บ้านทำร่ม"},
+  acts:{hut:"ทำงานในบ้าน",home:"ทำงานในเรือน",wat:"ทำบุญ",sala:"ฟังธรรม",market:"ค้าขายในกาด",stage:"ฟ้อนเล็บ",craft:"ทำร่มบ่อสร้าง",mall:"ขายของในห้าง"},
+  icons:{home:"homeN",market:"stall",stage:"stage",craft:"umbrella"},
+  cards:{
+   homePlace:{t:"เรือนกาแล",b:"เรือนกาแลเป็นเรือนพื้นถิ่นล้านนา มีไม้กาแลไขว้กันบนยอดจั่ว"},
+   homeHazard:{t:"เรือนรับอากาศหนาว",b:"ภาคเหนืออากาศหนาวกว่าภาคอื่น เรือนพื้นถิ่นจึงมีฝาทึบและหน้าต่างไม่มาก ช่วยเก็บความอบอุ่น"},
+   wat:{t:"วัดล้านนา",b:"วัดในล้านนามีศิลปะเฉพาะ เช่น วิหารที่มีหลังคาซ้อนลดหลั่นแผ่ลงต่ำ วัดเป็นศูนย์กลางงานบุญของชุมชน"},
+   sala:SALA_CARD,
+   market:{t:"กาด",b:"กาด เป็นคำล้านนา หมายถึงตลาด ชาวบ้านนำผลผลิตและของใช้มาซื้อขายกัน"},
+   food:{t:"อาหารเหนือ",b:"ข้าวซอยเป็นเส้นแบนในน้ำแกงกะทิ แกงฮังเลเป็นแกงหมูรสเข้มไม่ใส่กะทิ และน้ำพริกหนุ่มทำจากพริกหนุ่มย่าง"},
+   stage:{t:"ฟ้อนเล็บ",b:"ฟ้อนเล็บเป็นการฟ้อนของล้านนา ผู้ฟ้อนสวมเล็บยาวสีทองแปดนิ้ว เว้นนิ้วหัวแม่มือ"},
+   music:{t:"สะล้อ ซอ ซึง",b:"สะล้อเป็นเครื่องสี ซึงเป็นเครื่องดีด ส่วนซอ หมายถึงการขับร้องเพลงพื้นบ้านล้านนา"},
+   craft:{t:"ร่มบ่อสร้าง",b:"ร่มบ่อสร้างเป็นหัตถกรรมของบ้านบ่อสร้าง อำเภอสันกำแพง จังหวัดเชียงใหม่ ทำจากกระดาษสาหรือผ้า และวาดลวดลายด้วยมือ"},
+   dress:{t:"ซิ่นตีนจก และเสื้อหม้อห้อม",b:"ผ้าซิ่นตีนจกต่อตีนซิ่นด้วยผ้าทอลายจก ส่วนเสื้อหม้อห้อมย้อมสีครามจากต้นห้อม มีชื่อเสียงที่จังหวัดแพร่"},
+   fest0:{t:"ปี๋ใหม่เมือง",b:"ปี๋ใหม่เมืองคือสงกรานต์ของล้านนา ลูกหลานไปดำหัวผู้ใหญ่เพื่อขอขมาและขอพร และขนทรายเข้าวัด"},
+   fest1:{t:"ยี่เป็ง",b:"ยี่เป็ง คือวันเพ็ญเดือนยี่ตามปฏิทินล้านนา ตรงกับเพ็ญเดือน 12 ของภาคกลาง ชาวบ้านจุดผางประทีป แขวนโคม และปล่อยโคมลอย"},
+   belief:{t:"บายศรีสู่ขวัญ",b:"ชาวล้านนาและชาวอีสานเชื่อว่าคนมีขวัญประจำตัว เมื่อเดินทางไกลหรือเจ็บป่วย จะทำพิธีสู่ขวัญเพื่อเรียกขวัญกลับมาและให้กำลังใจ"},
+   speech:{t:"คำเมือง",b:"ภาษาถิ่นล้านนา เช่น กิ๋น (กิน) ลำ (อร่อย) อู้ (พูด) ปิ๊ก (กลับ) และลงท้ายด้วย เจ้า เพื่อความสุภาพ"}
+  },
+  beliefTrigger:"sukwan", beliefHint:"ร่วมพิธีสู่ขวัญเมื่อมีชาวบ้านกลับจากต่างถิ่น",
+  speechTrigger:"dialect", speechHint:"ตอบคำถามภาษาถิ่นถูก",
+  festivals:[
+   {name:"ปี๋ใหม่เมือง",phase:0,ok:["ดำหัวผู้ใหญ่","ขนทรายเข้าวัด","ทำบุญ"],bad:[["ชักลากเรือพระ","เป็นของประเพณีชักพระภาคใต้"],["ทำกระทงจากโฟม","โฟมย่อยสลายยาก และไม่ใช่ของปี๋ใหม่เมือง"]]},
+   {name:"ยี่เป็ง",phase:2,ok:["แขวนโคมหน้าบ้าน","จุดผางประทีป","ปล่อยโคมในพื้นที่ที่ทางการอนุญาต"],bad:[["จุดบั้งไฟขอฝน","เป็นของบุญบั้งไฟภาคอีสาน"],["ปล่อยโคมใกล้สนามบิน","เสี่ยงอันตรายต่อการบินและไฟไหม้"]]}
+  ],
+  extraEvents:["sukwan"],
+  questions:[
+   {type:"choice",dialect:true,q:"ชาวบ้านพูดว่า “ลำขนาด” หมายความว่าอะไร",a:["อร่อยมาก","พูดมาก","กลับบ้าน"]},
+   {type:"match",dialect:true,q:"จับคู่คำเมืองกับความหมาย",pairs:[["กิ๋น","กิน"],["อู้","พูด"],["ปิ๊ก","กลับ"]]},
+   {type:"choice",q:"ยี่เป็ง ตรงกับวันใดของภาคกลาง",a:["วันเพ็ญเดือน 12 (วันลอยกระทง)","วันสงกรานต์","วันเข้าพรรษา"]},
+   {type:"choice",q:"ผู้ฟ้อนเล็บสวมเล็บกี่นิ้ว",a:["8 นิ้ว เว้นนิ้วหัวแม่มือ","10 นิ้ว","2 นิ้ว"]},
+   {type:"match",q:"จับคู่ให้ถูกต้อง",pairs:[["ร่มบ่อสร้าง","เชียงใหม่"],["เสื้อหม้อห้อม","แพร่"],["สะล้อ","เครื่องสี"]]},
+   {type:"choice",q:"การดำหัวในปี๋ใหม่เมืองมีจุดประสงค์ใด",a:["ขอขมาและขอพรผู้ใหญ่","ขอฝน","อุทิศส่วนกุศลให้บรรพบุรุษ"]},
+   {type:"choice",q:"ปัจจัยใดทำให้เรือนพื้นถิ่นภาคเหนือมีฝาทึบและหน้าต่างไม่มาก",a:["อากาศหนาว ต้องเก็บความอบอุ่น","น้ำท่วมบ่อย","ลมทะเลแรง"],ind:"ส 4.3 ม.4–6/3"},
+   {type:"choice",q:"โคมลอยในงานยี่เป็งเสี่ยงไฟไหม้และรบกวนการบิน แนวทางใดเหมาะสมที่สุด",a:["ปล่อยโคมเฉพาะเวลาและพื้นที่ที่ทางการอนุญาต และเน้นการแขวนโคม","เลิกจัดงานยี่เป็ง","ปล่อยโคมได้ทุกที่ตามสะดวก"],ind:"ส 4.3 ม.4–6/5"},
+   {type:"order",q:"เรียงลำดับวันในปี๋ใหม่เมือง",items:["วันสังขานต์ล่อง","วันเนา","วันพญาวัน"]},
+   {type:"choice",q:"ข้าวซอยมีลักษณะอย่างไร",a:["เส้นแบนในน้ำแกงกะทิ","แกงหมูไม่ใส่กะทิ","ข้าวเหนียวกับน้ำพริก"]}
+  ]
+ },
+ northeast:{
+  name:"ภาคอีสาน", seasons:["ฤดูร้อน","ฤดูฝน","ฤดูหนาว"],
+  icon:"homeNE",
+  hazard:{phase:0,name:"ฝนแล้ง",fx:"drought",title:"แล้งจัด อากาศร้อน",when:"ปลายฤดูร้อน",
+    forecast:["จะแล้งเล็กน้อย","จะแล้งปานกลาง","จะแล้งจัด"],
+    safe:"อยู่ได้ทั้งหมด เพราะใต้ถุนสูงโปร่ง เป็นที่หลบร้อนในเวลากลางวัน"},
+  names:{hut:"บ้านติดพื้นหลังคาเตี้ย",home:"เรือนเกย",market:"ตลาดชุมชน",stage:"ลานหมอลำ",craft:"กี่ทอผ้าไหม"},
+  acts:{hut:"ทำงานในบ้าน",home:"ทำงานใต้ถุนเรือน",wat:"ทำบุญ",sala:"ฟังธรรม",market:"ค้าขายในตลาด",stage:"ฟังหมอลำ",craft:"ทอผ้าไหม",mall:"ขายของในห้าง"},
+  icons:{home:"homeNE",market:"stall",stage:"stage",craft:"loom"},
+  cards:{
+   homePlace:{t:"เรือนเกย",b:"เรือนเกย หรือเฮือนเกย เป็นเรือนพื้นถิ่นอีสาน มีส่วนต่อยื่นจากเรือนใหญ่เรียกว่า เกย ใช้รับแขกและนั่งเล่น"},
+   homeHazard:{t:"ใต้ถุนหลบร้อน",b:"อีสานมีฤดูแล้งยาวและอากาศร้อน ใต้ถุนเรือนสูงโปร่งเป็นที่หลบร้อนในเวลากลางวัน ใช้ทอผ้าและเก็บเครื่องมือ"},
+   wat:{t:"สิมและฮูปแต้ม",b:"วัดอีสานหลายแห่งมีสิมเป็นอาคารสำคัญ และบางแห่งมีฮูปแต้ม คือภาพจิตรกรรมบนผนังสิม"},
+   sala:SALA_CARD,
+   market:{t:"ตลาดชุมชน",b:"ชาวบ้านนำผลผลิตจากนาและป่ามาซื้อขายและแลกเปลี่ยนกันในตลาดชุมชน"},
+   food:{t:"อาหารอีสาน",b:"อาหารอีสานมีข้าวเหนียวเป็นอาหารหลัก กินคู่กับส้มตำและลาบ ใส่ข้าวเหนียวในกระติบข้าวเพื่อให้นุ่มนาน"},
+   stage:{t:"หมอลำ",b:"หมอลำเป็นศิลปะการขับร้องของอีสาน หมอ หมายถึงผู้ชำนาญ ลำ หมายถึงการขับร้อง"},
+   music:{t:"แคน พิณ โปงลาง",b:"แคนเป็นเครื่องเป่า พิณเป็นเครื่องดีด และโปงลางเป็นเครื่องตีทำจากท่อนไม้เรียงกัน"},
+   craft:{t:"ผ้าไหมมัดหมี่",b:"ชาวอีสานทอผ้าด้วยกี่ใต้ถุนเรือน ผ้าไหมมัดหมี่ได้ลวดลายจากการมัดเส้นไหมก่อนนำไปย้อมสี"},
+   dress:{t:"ผ้าขาวม้าและซิ่นไหม",b:"ผ้าขาวม้าใช้ได้หลายอย่าง เช่น คาดเอว โพกศีรษะ และนุ่งอาบน้ำ ส่วนผ้าซิ่นไหมมัดหมี่ใช้ในงานบุญ"},
+   fest0:{t:"บุญบั้งไฟ",b:"บุญบั้งไฟจัดในเดือนหก ก่อนฤดูทำนา ชาวบ้านจุดบั้งไฟเพื่อขอฝนจากพญาแถน งานที่มีชื่อเสียงอยู่ที่จังหวัดยโสธร"},
+   fest1:{t:"แห่เทียนพรรษา",b:"ช่วงเข้าพรรษา ชาวบ้านหล่อเทียนและแกะสลักลวดลาย แล้วแห่ไปถวายวัดให้พระใช้ตลอดพรรษา งานที่มีชื่อเสียงอยู่ที่จังหวัดอุบลราชธานี"},
+   belief:{t:"ฮีตสิบสอง",b:"ฮีตสิบสอง คือประเพณี 12 เดือนของชาวอีสาน แต่ละเดือนมีงานบุญประจำ เช่น บุญบั้งไฟในเดือนหก"},
+   speech:{t:"ภาษาอีสาน",b:"ภาษาถิ่นอีสาน เช่น แซ่บ (อร่อย) เฮ็ด (ทำ) เว้า (พูด) ข่อย (ฉัน) หลาย (มาก)"}
+  },
+  beliefTrigger:"fest", beliefHint:"จัดงานบุญประเพณีงานแรก",
+  speechTrigger:"dialect", speechHint:"ตอบคำถามภาษาถิ่นถูก",
+  festivals:[
+   {name:"บุญบั้งไฟ",phase:0,ok:["แห่บั้งไฟรอบหมู่บ้าน","จุดบั้งไฟขอฝนจากพญาแถน"],bad:[["ปล่อยโคมลอย","เป็นของประเพณียี่เป็งภาคเหนือ"],["ชิงเปรต","เป็นของสารทเดือนสิบภาคใต้"]]},
+   {name:"แห่เทียนพรรษา",phase:1,ok:["หล่อเทียนและแกะสลักลวดลาย","แห่เทียนไปถวายวัด"],bad:[["สาดน้ำกัน","เป็นของสงกรานต์"],["ปล่อยโคมลอย","เป็นของประเพณียี่เป็งภาคเหนือ"]]}
+  ],
+  extraEvents:["sukwan"],
+  questions:[
+   {type:"choice",dialect:true,q:"ชาวบ้านพูดว่า “แซ่บหลาย” หมายความว่าอะไร",a:["อร่อยมาก","ทำมาก","พูดมาก"]},
+   {type:"match",dialect:true,q:"จับคู่ภาษาอีสานกับความหมาย",pairs:[["เฮ็ด","ทำ"],["เว้า","พูด"],["ข่อย","ฉัน"]]},
+   {type:"choice",q:"บุญบั้งไฟจัดขึ้นเพื่อขอสิ่งใด",a:["ขอฝนจากพญาแถนก่อนฤดูทำนา","ขอขมาแม่น้ำ","อุทิศส่วนกุศลให้บรรพบุรุษ"]},
+   {type:"choice",q:"ฮูปแต้ม คืออะไร",a:["ภาพจิตรกรรมบนผนังสิม","เครื่องดนตรีพื้นบ้าน","อาหารพื้นบ้าน"]},
+   {type:"match",q:"จับคู่เครื่องดนตรีกับประเภท",pairs:[["แคน","เครื่องเป่า"],["พิณ","เครื่องดีด"],["โปงลาง","เครื่องตี"]]},
+   {type:"choice",q:"ผ้าไหมมัดหมี่ได้ลวดลายจากวิธีใด",a:["มัดเส้นไหมก่อนนำไปย้อม","วาดสีบนผ้า","ปักด้วยด้าย"]},
+   {type:"choice",q:"ปัจจัยใดทำให้ชาวอีสานใช้ใต้ถุนเรือนเป็นที่ทำงานในเวลากลางวัน",a:["อากาศร้อน ใต้ถุนโปร่งและร่มเย็น","น้ำท่วมทุกปี","อากาศหนาวจัด"],ind:"ส 4.3 ม.4–6/3"},
+   {type:"choice",q:"บุญบั้งไฟสะท้อนความสัมพันธ์ระหว่างวัฒนธรรมกับสิ่งใดของชาวอีสาน",a:["วิถีเกษตรกรรมที่พึ่งพาน้ำฝน","การค้าทางทะเล","อุตสาหกรรมในเมือง"],ind:"ส 4.3 ม.4–6/3"},
+   {type:"order",q:"เรียงลำดับการเตรียมแห่เทียนพรรษา",items:["หล่อเทียน","แกะสลักลวดลาย","แห่เทียนไปถวายวัด"]},
+   {type:"choice",q:"แห่เทียนพรรษามีชื่อเสียงที่จังหวัดใด",a:["อุบลราชธานี","ยโสธร","ขอนแก่น"]}
+  ]
+ },
+ south:{
+  name:"ภาคใต้", seasons:["ฤดูร้อน","ฤดูฝน","ฤดูมรสุม"],
+  icon:"homeS",
+  hazard:{phase:2,name:"ลมมรสุม",fx:"storm",title:"ลมมรสุมพัดแรง",when:"ปลายฤดูมรสุม",
+    forecast:["ลมจะแรงเล็กน้อย","ลมจะแรงปานกลาง","ลมจะแรงมาก"],
+    safe:"รอดทั้งหมด เพราะหลังคาปั้นหยาลาดลงทั้งสี่ด้าน ลมปะทะได้น้อย"},
+  names:{hut:"บ้านชั่วคราวหลังคาเบา",home:"เรือนปั้นหยา",market:"ตลาดชุมชน",stage:"โรงหนังตะลุง",craft:"บ้านจักสานกระจูด"},
+  acts:{hut:"ทำงานในบ้าน",home:"ทำงานในเรือน",wat:"ทำบุญ",sala:"ฟังธรรม",market:"ค้าขายในตลาด",stage:"ดูหนังตะลุง",craft:"สานกระจูด",mall:"ขายของในห้าง"},
+  icons:{home:"homeS",market:"stall",stage:"shadow",craft:"mat"},
+  cards:{
+   homePlace:{t:"หลังคาปั้นหยา",b:"เรือนพื้นถิ่นภาคใต้หลายแห่งใช้หลังคาทรงปั้นหยา ซึ่งลาดลงทั้งสี่ด้าน ลมจึงปะทะได้น้อย"},
+   homeHazard:{t:"ตีนเสา",b:"ภาคใต้ฝนตกชุกและมีลมมรสุม เสาเรือนตั้งบนตีนเสาที่ทำจากปูนหรือหิน ช่วยกันความชื้นและปลวก และยกย้ายเรือนได้"},
+   wat:{t:"วัดกับงานบุญภาคใต้",b:"วัดเป็นศูนย์กลางของชุมชนภาคใต้ และเป็นที่จัดงานบุญสำคัญ เช่น ชักพระ และสารทเดือนสิบ"},
+   sala:SALA_CARD,
+   market:{t:"ตลาดชุมชนภาคใต้",b:"ภาคใต้ติดทะเลทั้งสองฝั่ง ตลาดชุมชนจึงมีอาหารทะเลและผลผลิตจากสวน"},
+   food:{t:"อาหารใต้",b:"อาหารใต้รสจัดและเผ็ด แกงไตปลาทำจากไตปลาหมัก แกงส้มหรือแกงเหลืองมีขมิ้นเป็นเครื่องแกงสำคัญ"},
+   stage:{t:"หนังตะลุง",b:"หนังตะลุงเป็นการแสดงเงาจากรูปหนังที่ฉลุลวดลาย นายหนังเชิดรูปและพากย์เสียงเองหลังจอผ้า"},
+   music:{t:"โนรา",b:"โนราเป็นการร่ายรำและขับร้องของภาคใต้ ผู้แสดงสวมเครื่องลูกปัดและเทริด ยูเนสโกขึ้นทะเบียนโนราเป็นมรดกทางวัฒนธรรมที่จับต้องไม่ได้เมื่อ พ.ศ. 2564"},
+   craft:{t:"จักสานกระจูด",b:"กระจูดเป็นพืชในพื้นที่พรุ ชาวบ้านนำมาจักสานเป็นเสื่อ กระเป๋า และภาชนะ แหล่งที่รู้จัก เช่น ทะเลน้อย จังหวัดพัทลุง"},
+   dress:{t:"ผ้ายกนาหมื่นศรีและผ้าปาเต๊ะ",b:"ผ้ายกนาหมื่นศรีเป็นผ้าทอมือของจังหวัดตรัง ส่วนผ้าปาเต๊ะเป็นผ้าลวดลายที่นิยมนุ่งในภาคใต้"},
+   fest0:{t:"สารทเดือนสิบ",b:"สารทเดือนสิบเป็นการทำบุญอุทิศส่วนกุศลให้บรรพบุรุษ ชาวบ้านยกหฺมรับไปวัด ตั้งเปรตแล้วชิงเปรต งานที่มีชื่อเสียงอยู่ที่จังหวัดนครศรีธรรมราช"},
+   fest1:{t:"ชักพระ",b:"ชักพระจัดหลังวันออกพรรษา ชาวบ้านอัญเชิญพระพุทธรูปขึ้นเรือพระหรือรถพระ แล้วช่วยกันชักลากไปรอบชุมชน"},
+   belief:{t:"ทำบุญขึ้นบ้านใหม่",b:"เมื่อสร้างเรือนเสร็จ ชาวบ้านทำบุญขึ้นบ้านใหม่ นิมนต์พระมาสวดเพื่อความเป็นสิริมงคล"},
+   speech:{t:"ภาษาใต้",b:"ภาษาถิ่นใต้ เช่น หรอย (อร่อย) แหลง (พูด) หลบ (กลับ) พรือ (อย่างไร)"}
+  },
+  beliefTrigger:"newhome", beliefHint:"ทำบุญขึ้นบ้านใหม่เมื่อสร้างเรือนหลังแรก",
+  speechTrigger:"dialect", speechHint:"ตอบคำถามภาษาถิ่นถูก",
+  festivals:[
+   {name:"สารทเดือนสิบ",phase:1,ok:["ยกหฺมรับไปวัด","ตั้งเปรตแล้วชิงเปรต","ทำบุญอุทิศให้บรรพบุรุษ"],bad:[["ดำหัวผู้ใหญ่","เป็นของปี๋ใหม่เมืองภาคเหนือ"],["จุดบั้งไฟขอฝน","เป็นของบุญบั้งไฟภาคอีสาน"]]},
+   {name:"ชักพระ",phase:2,ok:["อัญเชิญพระพุทธรูปขึ้นเรือพระ","ช่วยกันชักลากไปรอบชุมชน"],bad:[["ปล่อยโคมลอย","เป็นของประเพณียี่เป็งภาคเหนือ"],["หล่อเทียนพรรษา","เป็นของช่วงเข้าพรรษา ส่วนชักพระจัดหลังออกพรรษา"]]}
+  ],
+  extraEvents:[],
+  questions:[
+   {type:"choice",dialect:true,q:"ชาวบ้านพูดว่า “หรอยจังฮู้” หมายความว่าอะไร",a:["อร่อยมาก","พูดมาก","กลับบ้าน"]},
+   {type:"match",dialect:true,q:"จับคู่ภาษาใต้กับความหมาย",pairs:[["แหลง","พูด"],["หลบ","กลับ"],["พรือ","อย่างไร"]]},
+   {type:"choice",q:"หลังคาปั้นหยาเหมาะกับภาคใต้เพราะอะไร",a:["ลาดลงทั้งสี่ด้าน ลมปะทะได้น้อย","ทำให้บ้านอุ่น","ใช้ตากปลาได้"]},
+   {type:"choice",q:"ตีนเสาช่วยเรือนภาคใต้อย่างไร",a:["กันความชื้นและปลวก","ใช้เป็นที่นั่งเล่น","ใช้ประดับให้สวยอย่างเดียว"]},
+   {type:"match",q:"จับคู่ให้ถูกต้อง",pairs:[["ผ้ายกนาหมื่นศรี","ตรัง"],["กระจูดทะเลน้อย","พัทลุง"],["สารทเดือนสิบ","นครศรีธรรมราช"]]},
+   {type:"choice",q:"สารทเดือนสิบทำเพื่ออะไร",a:["อุทิศส่วนกุศลให้บรรพบุรุษ","ขอฝน","ขอขมาแม่น้ำ"]},
+   {type:"choice",q:"ยูเนสโกขึ้นทะเบียนโนราเป็นมรดกประเภทใด",a:["มรดกทางวัฒนธรรมที่จับต้องไม่ได้","มรดกโลกทางธรรมชาติ","โบราณสถาน"]},
+   {type:"choice",q:"การที่ชาวบ้านช่วยกันชักลากเรือพระ สะท้อนค่านิยมใด",a:["ความสามัคคีของชุมชน","การแข่งขันหาผู้ชนะ","ความร่ำรวย"]},
+   {type:"order",q:"เรียงลำดับประเพณีชักพระ",items:["ออกพรรษา","อัญเชิญพระพุทธรูปขึ้นเรือพระ","ชักลากไปรอบชุมชน"]},
+   {type:"choice",q:"คนรุ่นใหม่สนใจหนังตะลุงน้อยลง แนวทางใดช่วยอนุรักษ์ได้ดีที่สุด",a:["นำหนังตะลุงมาเล่าเรื่องร่วมสมัยและเผยแพร่ทางสื่อออนไลน์","ห้ามดูการแสดงสมัยใหม่","เลิกแสดงหนังตะลุง"],ind:"ส 2.1 ม.4–6/5"}
+  ]
+ }
+};
+var REGION_ORDER=["central","north","northeast","south"];
+var PROBLEM_QS=[
+ {type:"choice",q:"แนวทางใดดูแลผู้สูงอายุโดยใช้ค่านิยมไทยได้เหมาะสมที่สุด",a:["จัดกิจกรรมให้ลูกหลานกลับบ้านช่วงประเพณี และให้ผู้สูงอายุถ่ายทอดภูมิปัญญาที่วัด","ส่งผู้สูงอายุทุกคนไปบ้านพักในเมือง","ให้ผู้สูงอายุดูแลตัวเอง"],ind:"ส 2.1 ม.4–6/5"},
+ {type:"choice",q:"ผู้ใหญ่อยากจัดงานประเพณีแบบเดิม เด็กอยากจัดแบบใหม่ แนวทางใดเหมาะสมที่สุด",a:["รักษาพิธีหลักไว้ และเพิ่มกิจกรรมร่วมสมัยที่ทุกวัยออกแบบร่วมกัน","ยกเลิกพิธีเดิมทั้งหมด","ห้ามเด็กเสนอความเห็น"],ind:"ส 2.1 ม.4–6/5"},
+ {type:"choice",q:"ภูมิปัญญาจัดการน้ำของชุมชน เช่น เหมืองฝาย มีหลักสำคัญอย่างไร",a:["ชุมชนร่วมกันดูแลและแบ่งน้ำอย่างเป็นธรรมตามกติกา","ใครอยู่ต้นน้ำใช้ได้ก่อนไม่จำกัด","ให้เอกชนเป็นเจ้าของน้ำ"],ind:"ส 4.3 ม.4–6/3"},
+ {type:"choice",q:"การเว้นลานวัดและลานบ้านไว้ในชุมชนมีความสำคัญต่อวัฒนธรรมอย่างไร",a:["เป็นพื้นที่จัดงานประเพณีและการละเล่นที่ทำให้คนในชุมชนพบปะกัน","ใช้เป็นที่จอดรถอย่างเดียว","ไม่มีความสำคัญ"],ind:"ส 4.3 ม.4–6/5"},
+ {type:"choice",q:"ข้อใดเป็นวิธีป้องกันการยักยอกเงินทำบุญของชุมชนที่ดีที่สุด",a:["ประกาศรายรับรายจ่ายให้ทุกคนตรวจสอบได้ โดยมีบ้าน วัด โรงเรียนร่วมเป็นกรรมการ","ให้คนเดียวดูแลเงินทั้งหมด","ไม่ต้องจดบัญชีเพราะเป็นเงินทำบุญ"],ind:"บูรณาการรายวิชาการป้องกันการทุจริต"}
+];
+REGION_ORDER.forEach(function(id){R_ALL[id].questions=R_ALL[id].questions.concat(PROBLEM_QS);});
+
+var VALUES=[
+ {id:"v1",title:"ผู้ใหญ่นั่งอยู่",body:"หลานต้องเดินผ่านหน้าผู้ใหญ่ที่นั่งคุยกันอยู่ ควรทำอย่างไร",a:["ค้อมตัวลงเล็กน้อยแล้วเดินผ่าน","เดินผ่านตามปกติ","วิ่งผ่านเร็วๆ"],why:"การค้อมตัวเมื่อเดินผ่านผู้ใหญ่ แสดงความเคารพผู้อาวุโส"},
+ {id:"v2",title:"แขกมาเยี่ยมบ้าน",body:"มีแขกจากหมู่บ้านอื่นมาเยี่ยม ควรทำอย่างไร",a:["เชิญนั่ง แล้วยกน้ำมาต้อนรับ","ปล่อยให้ยืนรอหน้าบ้าน","บอกให้มาใหม่วันหลัง"],why:"การต้อนรับแขกด้วยน้ำใจ เป็นค่านิยมของคนไทย"},
+ {id:"v3",title:"ฤดูเกี่ยวข้าว",body:"นาของเพื่อนบ้านเกี่ยวข้าวไม่ทัน ควรทำอย่างไร",a:["ชวนกันไปลงแขกช่วยเกี่ยว","รอให้เขาจ้างคนเอง","ไม่ยุ่งเรื่องของคนอื่น"],why:"การลงแขก คือการช่วยกันทำงานโดยไม่คิดค่าจ้าง แล้วหมุนเวียนไปช่วยบ้านอื่น"},
+ {id:"v4",title:"พระบิณฑบาต",body:"พระเดินบิณฑบาตผ่านหน้าบ้าน ควรทำอย่างไร",a:["ถอดรองเท้าก่อนใส่บาตร","ใส่บาตรทั้งที่สวมรองเท้า","ยื่นของให้พระด้วยมือเดียวแบบรีบๆ"],why:"การถอดรองเท้าก่อนใส่บาตร แสดงความเคารพต่อพระสงฆ์"},
+ {id:"v5",title:"เพื่อนบ้านเดือดร้อน",body:"บ้านของเพื่อนบ้านเสียหายจากภัยธรรมชาติ ควรทำอย่างไร",a:["ชวนชาวบ้านช่วยกันซ่อมและแบ่งปันของใช้","รอให้หน่วยงานมาช่วยอย่างเดียว","ไม่ยุ่ง เพราะไม่ใช่บ้านของเรา"],why:"ความมีน้ำใจและการช่วยเหลือกัน ทำให้ชุมชนเข้มแข็ง"}
+];
+
+/* ---------- community problems ---------- */
+function problemDefs(){
+  var C=R===R_ALL.central;
+  var list=[
+   {id:"youth",title:"คนหนุ่มสาวย้ายไปทำงานในเมือง",body:"งานช่าง"+R.names.craft+"ไม่มีคนรุ่นใหม่สืบทอด",harm:R.names.craft+"ผลิตได้ครึ่งเดียว",
+    req:function(){return count("craft")>0;},
+    con:{label:"เปิดกลุ่มอาชีพหัตถกรรมในชุมชน",cost:30,fn:function(){state.cult=clamp(state.cult+5);},gain:"วัฒนธรรม +5"},
+    quick:{label:"สั่งของสำเร็จรูปจากโรงงานมาขายแทน",cost:0,fn:function(){state.mat+=15;state.cult=clamp(state.cult-10);},gain:"ได้วัสดุ 15 วัฒนธรรม −10"},
+    card:{t:"กลุ่มอาชีพในชุมชน",b:"เมื่อชุมชนมีกลุ่มอาชีพที่สร้างรายได้จากภูมิปัญญาท้องถิ่น คนรุ่นใหม่มีเหตุผลที่จะอยู่และสืบทอดงานช่าง ภูมิปัญญาจึงไม่สูญหาย"}},
+   {id:"elder",title:"ครูภูมิปัญญาสูงวัย",body:"ปราชญ์ชาวบ้านอายุมากขึ้น ความรู้ยังไม่ได้ถ่ายทอดให้คนรุ่นหลัง",harm:"วัฒนธรรม −5 ทุกฤดู",
+    con:{label:"เชิญปราชญ์ชาวบ้านสอนเด็กในโรงเรียน",cost:20,fn:function(){state.cult=clamp(state.cult+5);state.trust=clamp(state.trust+5);},gain:"วัฒนธรรม +5 ความไว้ใจ +5"},
+    quick:{label:"ขายเครื่องมือโบราณของปราชญ์ให้นักสะสม",cost:0,fn:function(){state.mat+=20;state.cult=clamp(state.cult-10);},gain:"ได้วัสดุ 20 วัฒนธรรม −10 ความรู้สูญหาย"},
+    card:{t:"ปราชญ์ชาวบ้าน",b:"ปราชญ์ชาวบ้านคือผู้มีความรู้ภูมิปัญญาท้องถิ่น การเชิญมาสอนในโรงเรียนหรือจดบันทึกความรู้ไว้ ช่วยให้ภูมิปัญญาส่งต่อถึงคนรุ่นหลัง"}},
+   {id:"online",title:"เด็กติดสื่อออนไลน์",body:"เด็กไม่สนใจ"+R.names.stage+" ไม่มีใครมาเล่นหรือมาชม",harm:R.names.stage+"ไม่มีคนใช้",
+    req:function(){return count("stage")>0;},
+    con:{label:"นำการแสดงพื้นบ้านมาเล่าเรื่องร่วมสมัย เผยแพร่ทางออนไลน์",cost:25,fn:function(){state.cult=clamp(state.cult+5);state.happy=clamp(state.happy+5);},gain:"วัฒนธรรม +5 ความสุข +5"},
+    quick:{label:"เปลี่ยนพื้นที่เป็นร้านเกมให้เด็ก",cost:0,fn:function(){removeOne("stage");state.mat+=20;state.cult=clamp(state.cult-10);},gain:"ได้วัสดุ 20 วัฒนธรรม −10 และ"+R.names.stage+"ถูกรื้อ 1 แห่ง"},
+    card:{t:"ปรับให้ร่วมสมัย",b:"การนำศิลปะพื้นบ้านมาเล่าเรื่องร่วมสมัยและเผยแพร่ผ่านสื่อออนไลน์ เป็นการปรับตัวโดยยังรักษาแก่นของวัฒนธรรม ทำให้คนรุ่นใหม่เข้าถึงได้"}},
+   {id:"dialect",title:C?"เด็กใช้คำสุภาพน้อยลง":"เด็กพูดภาษาถิ่นน้อยลง",body:C?"เด็กพูดตามสื่อออนไลน์ ไม่ลงท้ายด้วยครับ ค่ะ กับผู้ใหญ่":"เด็กพูดแต่ภาษากลาง ภาษาถิ่นกำลังเลือนหาย",harm:"ความไว้ใจ −5 ทุกฤดู",
+    con:{label:"ชวนผู้สูงอายุสอนผ่านเพลงและนิทาน",cost:15,fn:function(){state.trust=clamp(state.trust+10);},gain:"ความไว้ใจ +10"},
+    quick:{label:"ห้ามเด็กใช้โทรศัพท์ทั้งหมู่บ้าน",cost:0,fn:function(){state.happy=clamp(state.happy-10);},gain:"ความสุข −10 เด็กไม่พอใจ และไม่ได้เรียนภาษาเพิ่ม"},
+    card:{t:"ภาษาคือวัฒนธรรม",b:"ภาษาถิ่นและคำสุภาพเป็นวัฒนธรรมที่จับต้องไม่ได้ การเรียนผ่านเพลงพื้นบ้าน นิทาน และการพูดคุยกับผู้สูงอายุ ช่วยให้ภาษายังมีชีวิตอยู่ในชุมชน"}},
+   {id:"waste",title:"ขยะล้นหลังงานประเพณี",body:"หลังงานบุญ มีขยะโฟมและพลาสติกเต็มลานวัดและลำน้ำ",harm:"ความสุข −5 ทุกฤดู",
+    con:{label:"รณรงค์ใช้วัสดุธรรมชาติ และจัดจุดแยกขยะในงาน",cost:20,fn:function(){state.happy=clamp(state.happy+5);state.cult=clamp(state.cult+5);},gain:"ความสุข +5 วัฒนธรรม +5"},
+    quick:{label:"เผาขยะทิ้งหลังหมู่บ้าน",cost:0,fn:function(){state.happy=clamp(state.happy-5);state.trust=clamp(state.trust-5);},gain:"ความสุข −5 ความไว้ใจ −5 ควันรบกวนชาวบ้าน"},
+    card:{t:"งานประเพณีรักษ์โลก",b:"การใช้วัสดุธรรมชาติ เช่น ใบตอง และการแยกขยะในงานประเพณี ช่วยรักษาสิ่งแวดล้อม โดยยังคงความหมายของประเพณีไว้"}},
+   {id:"tourism",title:"ประเพณีกลายเป็นการแสดงเพื่อขาย",body:"นักท่องเที่ยวมามาก งานบุญถูกจัดเพื่อถ่ายรูปและขายของ ความหมายเดิมเริ่มหายไป",harm:"วัฒนธรรม −5 ทุกฤดู แต่ได้วัสดุเพิ่ม 10",
+    req:function(){return count("market")>0;},
+    con:{label:"ชุมชนตั้งกติกา แยกพิธีจริงกับการแสดงให้นักท่องเที่ยว",cost:25,fn:function(){state.cult=clamp(state.cult+10);},gain:"วัฒนธรรม +10"},
+    quick:{label:"ขายสิทธิ์จัดงานให้บริษัททัวร์",cost:0,fn:function(){state.mat+=30;state.cult=clamp(state.cult-15);},gain:"ได้วัสดุ 30 วัฒนธรรม −15"},
+    card:{t:"ท่องเที่ยวโดยชุมชน",b:"การท่องเที่ยวโดยชุมชน คือชุมชนเป็นผู้กำหนดกติกาและได้รับประโยชน์เอง แยกพิธีกรรมจริงออกจากการแสดง ทำให้มีรายได้โดยประเพณีไม่เสียความหมาย"}},
+   {id:"decay",title:"อาคารเก่าทรุดโทรม",body:"สิ่งก่อสร้างเก่าในหมู่บ้านผุพัง ใช้งานไม่ได้",harm:"สิ่งก่อสร้างที่ทรุดโทรมหยุดทำงาน",
+    req:function(){return count("wat")+count("sala")+count("home")>0;},
+    onSpawn:function(){var pick=-1;["wat","sala","home"].some(function(t){for(var i=0;i<state.grid.length;i++)if(state.grid[i]&&state.grid[i].type===t){pick=i;return true;}return false;});state.broken=pick;},
+    con:{label:"ระดมทุนบูรณะโดยรักษารูปแบบเดิม",cost:30,fn:function(){state.broken=-1;state.cult=clamp(state.cult+5);state.trust=clamp(state.trust+5);},gain:"วัฒนธรรม +5 ความไว้ใจ +5"},
+    quick:{label:"รื้อแล้วสร้างใหม่แบบสมัยใหม่",cost:10,fn:function(){state.broken=-1;state.cult=clamp(state.cult-10);},gain:"วัฒนธรรม −10 รูปแบบดั้งเดิมหายไป"},
+    card:{t:"บูรณะอย่างถูกวิธี",b:"การบูรณะอาคารเก่าควรรักษารูปแบบ วัสดุ และลวดลายเดิมไว้ให้มากที่สุด เพื่อไม่ให้คุณค่าทางประวัติศาสตร์และศิลปะสูญหาย"}},
+   {id:"alone",title:"ผู้สูงอายุอยู่ลำพัง",body:"ลูกหลานไปทำงานไกล ผู้สูงอายุอยู่บ้านลำพัง ไม่มีคนดูแลและไม่มีใครฟังเรื่องเล่าของชุมชน",harm:"ความไว้ใจ −5 และความสุข −5 ทุกฤดู",
+    con:{label:"จัดกิจกรรมให้ลูกหลานกลับบ้านช่วงประเพณี และตั้งชมรมผู้สูงอายุที่วัด",cost:20,fn:function(){state.trust=clamp(state.trust+10);state.happy=clamp(state.happy+5);},gain:"ความไว้ใจ +10 ความสุข +5"},
+    quick:{label:"ส่งผู้สูงอายุไปบ้านพักในเมือง",cost:0,fn:function(){state.mat+=10;state.cult=clamp(state.cult-10);state.trust=clamp(state.trust-5);},gain:"ได้วัสดุ 10 วัฒนธรรม −10 ความไว้ใจ −5"},
+    ind:"ส 2.1 ม.4–6/5",
+    card:{t:"กตัญญูต่อผู้สูงอายุ",b:"ความกตัญญูเป็นค่านิยมสำคัญของสังคมไทย การให้ผู้สูงอายุมีบทบาทในวัดและงานประเพณี ช่วยให้ท่านมีคุณค่าและภูมิปัญญาได้ส่งต่อ"}},
+   {id:"gap",title:"ช่องว่างระหว่างวัย",body:"ผู้ใหญ่อยากจัดงานประเพณีแบบเดิมทุกอย่าง เด็กอยากเปลี่ยนเป็นคอนเสิร์ต ทะเลาะกันจนตกลงไม่ได้",harm:"จัดเทศกาลไม่ได้จนกว่าจะแก้ และความไว้ใจ −5 ทุกฤดู",
+    req:function(){return festivalFor(state.season%3)>=0;},
+    con:{label:"ประชุมให้ทุกวัยออกแบบงานร่วมกัน รักษาพิธีหลัก เพิ่มกิจกรรมร่วมสมัย",cost:15,fn:function(){state.cult=clamp(state.cult+5);state.trust=clamp(state.trust+10);},gain:"วัฒนธรรม +5 ความไว้ใจ +10"},
+    quick:{label:"จ้างบริษัทจัดอีเวนต์",cost:0,fn:function(){state.mat+=20;state.cult=clamp(state.cult-10);},gain:"ได้วัสดุ 20 วัฒนธรรม −10"},
+    ind:"ส 2.1 ม.4–6/5",
+    card:{t:"ประเพณีที่ทุกวัยร่วมออกแบบ",b:"ประเพณีอยู่รอดได้เมื่อคนรุ่นใหม่มีส่วนร่วม การรักษาพิธีหลักและเปิดให้เพิ่มกิจกรรมใหม่ เป็นการปรับตัวโดยไม่ทิ้งแก่นของประเพณี"}},
+   {id:"water",title:"แย่งชิงน้ำ",body:"โรงงานที่มาตั้งใกล้หมู่บ้านสูบน้ำไปใช้มาก ชาวบ้านไม่มีน้ำพอทำนาและใช้ในงานบุญ",harm:R.names.home+"ผลิตได้ครึ่งเดียว และความสุข −5 ทุกฤดู",
+    req:function(){return count("home")>0;},
+    con:{label:"ฟื้นระบบจัดการน้ำของชุมชน ตั้งกติกาแบ่งน้ำร่วมกับโรงงาน",cost:25,fn:function(){state.happy=clamp(state.happy+5);state.cult=clamp(state.cult+5);},gain:"ความสุข +5 วัฒนธรรม +5"},
+    quick:{label:"ให้โรงงานสูบน้ำได้ตามต้องการ รับค่าตอบแทน",cost:0,fn:function(){state.mat+=30;state.happy=clamp(state.happy-10);state.cult=clamp(state.cult-5);},gain:"ได้วัสดุ 30 ความสุข −10 วัฒนธรรม −5"},
+    ind:"ส 4.3 ม.4–6/3",
+    card:{t:"ภูมิปัญญาจัดการน้ำ",b:"ชุมชนไทยมีภูมิปัญญาแบ่งปันน้ำร่วมกัน เช่น เหมืองฝายของภาคเหนือ ที่ชาวบ้านร่วมกันดูแลและแบ่งน้ำตามกติกาอย่างเป็นธรรม"}},
+   {id:"corrupt",title:"ทุจริตงบบูรณะวัดและงานประเพณี",body:"เงินที่ชาวบ้านร่วมทำบุญบูรณะวัดและจัดงานประเพณีหายไปบางส่วน ไม่มีใครตรวจสอบได้",harm:"วัสดุ −10 และความไว้ใจ −5 ทุกฤดู",
+    req:function(){return count("wat")>0;},
+    con:{label:"ตั้งคณะกรรมการจากบ้าน วัด โรงเรียน ร่วมตรวจสอบ และประกาศรายรับรายจ่าย",cost:10,fn:function(){state.trust=clamp(state.trust+10);state.cult=clamp(state.cult+5);},gain:"ความไว้ใจ +10 วัฒนธรรม +5"},
+    quick:{label:"ปิดเรื่องเงียบ ไม่ให้หมู่บ้านเสียชื่อ",cost:0,fn:function(){state.trust=clamp(state.trust-10);},gain:"ความไว้ใจ −10 ไม่มีใครรู้ว่าเงินหายไปไหน"},
+    ind:"บูรณาการรายวิชาการป้องกันการทุจริต",
+    card:{t:"บวรกับความโปร่งใส",b:"เมื่อบ้าน วัด และโรงเรียน ร่วมกันดูแลและเปิดเผยการใช้เงินของชุมชน ชาวบ้านจึงไว้ใจและร่วมทำบุญ งานประเพณีจึงดำเนินต่อไปได้"}},
+   {id:"crowd",player:true,title:"ชุมชนแออัด",body:"บ้านเรือนขยายจนรุกลานวัดและลานบ้าน ไม่มีที่จัดงานประเพณีและการละเล่น",harm:"ความสุข −5 ทุกฤดู และมีโอกาสไฟไหม้บ้านในกลุ่มที่แออัด",
+    con:{label:"จัดผังเอง: รื้อบ้านบางหลัง หรือวาง"+R.names.stage+"ไว้ในชุมชน",manual:true,cost:0,fn:function(){}},
+    quick:{label:"สร้างตึกห้องเช่ารวม",cost:0,fn:function(){state.crowdOff=true;state.mat+=20;state.cult=clamp(state.cult-10);},gain:"ได้วัสดุ 20 วัฒนธรรม −10"},
+    ind:"ส 4.3 ม.4–6/5",
+    card:{t:"พื้นที่ส่วนรวมของชุมชน",b:"ลานวัดและลานบ้านเป็นที่จัดงานประเพณีและการละเล่น ทำให้คนในชุมชนได้พบปะกัน การวางผังชุมชนจึงควรเว้นพื้นที่ส่วนรวมไว้"}}
+  ];
+  var reg={
+   central:{id:"canal",title:"แผนถมคลองทำถนน",body:"มีแผนถมคลองเพื่อทำถนน เรือแล่นไม่ได้ ตลาดน้ำเสี่ยงหายไป",harm:"ตลาดน้ำหยุดค้าขาย และวัฒนธรรม −5 ทุกฤดู",
+    req:function(){return count("market")>0;},
+    con:{label:"ทำทางเดินเลียบคลองแทนการถม และพัฒนาตลาดน้ำโดยชุมชน",cost:35,fn:function(){state.cult=clamp(state.cult+10);},gain:"วัฒนธรรม +10"},
+    quick:{label:"ถมคลองตามแผน",cost:0,fn:function(){removeAll("market");state.mat+=30;state.cult=clamp(state.cult-15);},gain:"ได้วัสดุ 30 วัฒนธรรม −15 ตลาดน้ำถูกรื้อทั้งหมด"},
+    card:{t:"รักษาวิถีริมน้ำ",b:"คลองเป็นหัวใจของวิถีชีวิตภาคกลาง การพัฒนาโดยไม่ถมคลอง เช่น ทำทางเดินเลียบคลอง ช่วยให้ชุมชนสะดวกขึ้นโดยยังรักษาตลาดน้ำไว้"}},
+   north:{id:"lantern",title:"ปล่อยโคมลอยผิดที่",body:"มีคนปล่อยโคมลอยใกล้สนามบินและป่า เกิดไฟไหม้และรบกวนการบิน",harm:"ความสุข −5 และความไว้ใจ −5 ทุกฤดู",
+    con:{label:"ร่วมกับทางการกำหนดเวลาและพื้นที่ปล่อยโคม เน้นแขวนโคม",cost:20,fn:function(){state.trust=clamp(state.trust+10);state.cult=clamp(state.cult+5);},gain:"ความไว้ใจ +10 วัฒนธรรม +5"},
+    quick:{label:"ห้ามจัดยี่เป็งทุกรูปแบบ",cost:0,fn:function(){state.cult=clamp(state.cult-15);},gain:"วัฒนธรรม −15 ประเพณีหายไป"},
+    card:{t:"ยี่เป็งอย่างปลอดภัย",b:"การกำหนดเวลาและพื้นที่ปล่อยโคม และหันมาแขวนโคมประดับ ช่วยลดไฟไหม้และอันตรายต่อการบิน โดยประเพณียังคงอยู่"}},
+   northeast:{id:"migrate",title:"แรงงานย้ายถิ่น",body:"คนวัยทำงานไปทำงานต่างถิ่นจำนวนมาก หมู่บ้านเหลือแต่ผู้สูงอายุกับเด็ก",harm:"ความสุข −5 และวัสดุ −5 ทุกฤดู",
+    con:{label:"ส่งเสริมอาชีพทอผ้าไหมและเกษตรในชุมชน ให้คนรุ่นใหม่กลับบ้าน",cost:30,fn:function(){state.happy=clamp(state.happy+10);state.cult=clamp(state.cult+5);},gain:"ความสุข +10 วัฒนธรรม +5"},
+    quick:{label:"ให้นายหน้าพาคนไปทำงานต่างถิ่นเพิ่ม",cost:0,fn:function(){state.mat+=25;state.cult=clamp(state.cult-10);state.happy=clamp(state.happy-5);},gain:"ได้วัสดุ 25 วัฒนธรรม −10 ความสุข −5"},
+    card:{t:"กลับบ้านเกิด",b:"เมื่อชุมชนมีอาชีพที่มั่นคงจากภูมิปัญญา เช่น การทอผ้าไหม คนรุ่นใหม่จึงกลับมาอยู่บ้าน ดูแลผู้สูงอายุ และสืบทอดประเพณีฮีตสิบสอง"}},
+   south:{id:"shadow",title:"หนังตะลุงและโนราขาดผู้สืบทอด",body:"นายหนังและครูโนราอายุมากขึ้น ไม่มีเยาวชนมาฝึก",harm:"โรงหนังตะลุงไม่มีการแสดง และวัฒนธรรม −5 ทุกฤดู",
+    req:function(){return count("stage")>0;},
+    con:{label:"ตั้งชมรมหนังตะลุงและโนราในโรงเรียน ให้นายหนังและครูโนราสอน",cost:25,fn:function(){state.cult=clamp(state.cult+10);},gain:"วัฒนธรรม +10"},
+    quick:{label:"เปิดเพลงจากลำโพงแทนการแสดงสด",cost:0,fn:function(){state.cult=clamp(state.cult-10);},gain:"วัฒนธรรม −10"},
+    card:{t:"สืบทอดศิลปะการแสดง",b:"การตั้งชมรมให้นายหนังและครูโนราถ่ายทอดให้เยาวชน ช่วยให้ศิลปะการแสดงภาคใต้มีผู้สืบทอด"}}
+  };
+  var rp=reg[state?state.region:"central"];rp.regional=true;list.push(rp);
+  return list;
+}
+var SPAWN={1:1,3:1,5:1,6:1,7:1,8:1};
+function probDef(id){var d=problemDefs();for(var k=0;k<d.length;k++)if(d[k].id===id)return d[k];return null;}
+function active(id){return state.probs.indexOf(id)>=0;}
+function removeOne(t){for(var i=0;i<state.grid.length;i++)if(state.grid[i]&&state.grid[i].type===t){state.grid[i]=null;return;}}
+function removeAll(t){for(var i=0;i<state.grid.length;i++)if(state.grid[i]&&state.grid[i].type===t)state.grid[i]=null;}
+function spawnProblem(noReqOnly){
+  var pool=problemDefs().filter(function(p){
+    if(p.player||state.probUsed.indexOf(p.id)>=0)return false;
+    if(noReqOnly)return !p.req&&!p.onSpawn;
+    return !p.req||p.req();
+  });
+  if(!pool.length)return;
+  var reg=pool.filter(function(p){return p.regional;});
+  var P=(reg.length&&state.season>=3&&Math.random()<0.5)?reg[0]:pool[Math.floor(Math.random()*pool.length)];
+  state.probs.push(P.id);state.probUsed.push(P.id);
+  if(P.onSpawn)P.onSpawn();
+  save();render();openProblem(P.id,true);
+}
+function openProblem(id,isNew){
+  var P=probDef(id);if(!P)return;
+  var h='<p class="from">ปัญหาชุมชน'+(isNew?" เรื่องใหม่":"")+'</p><h2 id="panelTitle">'+esc(P.title)+'</h2><p>'+esc(P.body)+'</p><p class="harm">ถ้าไม่แก้: '+esc(P.harm)+'</p><p>เลือกวิธีแก้ปัญหา</p>';
+  function pick(S,conserve){
+    state.mat-=S.cost;S.fn();
+    state.probs=state.probs.filter(function(x){return x!==id;});state.solved++;
+    var r='<h2 id="panelTitle">'+(conserve?"แก้ปัญหาแบบอนุรักษ์และปรับตัว":"แก้ปัญหาแบบเร่งด่วน")+'</h2><p>'+esc(S.gain)+'</p>';
+    if(conserve){state.solvedC++;state.cons[id]=true;r+='<div class="card"><b>บัตรความรู้การอนุรักษ์: '+esc(P.card.t)+'</b><p>'+esc(P.card.b)+'</p></div><p class="ind">'+esc(indText(P.ind||"ส 4.3 ม.4–6/5"))+'</p>';}
+    else r+='<p>ปัญหาจบลง แต่วัฒนธรรมของชุมชนเสียไป ลองคิดว่ามีทางที่ดีกว่านี้หรือไม่</p>';
+    openPanel(r);save();render();
+  }
+  var btns=[];
+  var c=P.con,q=P.quick;
+  if(c.manual)btns.push({label:c.label,fn:function(){say("จัดผังใหม่ให้ไม่มีบ้านถูกล้อมติดกัน 3 ด้าน หรือวาง"+R.names.stage+" แล้วปัญหาจะจบเอง","warn");}});
+  else btns.push({label:c.label+" (ใช้ "+c.cost+" วัสดุ)"+(state.mat<c.cost?" วัสดุไม่พอ":""),disabled:state.mat<c.cost,fn:function(){pick(c,true);}});
+  btns.push({label:q.label+(q.cost?" (ใช้ "+q.cost+" วัสดุ)":""),ghost:true,disabled:state.mat<q.cost,fn:function(){pick(q,false);}});
+  btns.push({label:"ปล่อยไว้ก่อน",ghost:true,fn:function(){say("ปัญหา"+P.title+"ยังค้างอยู่ "+P.harm,"warn");}});
+  openPanel(h,btns,false);
+}
+function indText(x){return x.indexOf("ส ")===0?"สอดคล้องกับตัวชี้วัด "+x:x;}
+function isHomeT(c){return c&&(c.type==="home"||c.type==="hut");}
+function crowdedTiles(){
+  var out=[];
+  state.grid.forEach(function(c,i){if(isHomeT(c)&&nb(i).filter(function(j){return isHomeT(state.grid[j]);}).length>=3)out.push(i);});
+  return out;
+}
+function crowdCondition(){return !state.crowdOff&&count("stage")===0&&crowdedTiles().length>0;}
+function checkCrowd(){
+  if(state.mode!=="free"||!state.started||state.over)return;
+  var on=crowdCondition();
+  if(on&&!active("crowd")){state.probs.push("crowd");save();render();openProblem("crowd",true);}
+  else if(!on&&active("crowd")){
+    state.probs=state.probs.filter(function(x){return x!=="crowd";});state.solved++;
+    if(!state.crowdOff){
+      state.solvedC++;var P=probDef("crowd");var first=!state.cons.crowd;state.cons.crowd=true;
+      openPanel('<h2 id="panelTitle">แก้ชุมชนแออัดด้วยการจัดผัง</h2><p>ชุมชนมีพื้นที่ส่วนรวมแล้ว ปัญหาจบลง</p>'+(first?'<div class="card"><b>บัตรความรู้การอนุรักษ์: '+esc(P.card.t)+'</b><p>'+esc(P.card.b)+'</p></div>':'')+'<p class="ind">'+esc(indText(P.ind))+'</p>');
+    }
+    save();render();
+  }
+}
+function problemEffects(notes){
+  state.probs.forEach(function(id){
+    if(id==="elder"||id==="canal"||id==="shadow")state.cult=clamp(state.cult-5);
+    if(id==="dialect")state.trust=clamp(state.trust-5);
+    if(id==="waste")state.happy=clamp(state.happy-5);
+    if(id==="tourism"){state.cult=clamp(state.cult-5);state.mat+=10;}
+    if(id==="lantern"){state.happy=clamp(state.happy-5);state.trust=clamp(state.trust-5);}
+    if(id==="migrate"){state.happy=clamp(state.happy-5);state.mat=Math.max(0,state.mat-5);}
+    if(id==="alone"){state.trust=clamp(state.trust-5);state.happy=clamp(state.happy-5);}
+    if(id==="gap")state.trust=clamp(state.trust-5);
+    if(id==="water")state.happy=clamp(state.happy-5);
+    if(id==="corrupt"){state.mat=Math.max(0,state.mat-10);state.trust=clamp(state.trust-5);}
+    if(id==="crowd"){
+      state.happy=clamp(state.happy-5);
+      if(Math.random()<1/3){var ct=crowdedTiles();if(ct.length){var huts=ct.filter(function(i){return state.grid[i].type==="hut";});var v=(huts.length?huts:ct)[0];
+        var t=nm(state.grid[v].type);state.grid[v]=null;notes.push("ไฟไหม้"+t+" 1 หลังในชุมชนแออัด");}}
+    }
+  });
+  if(state.probs.length)notes.push("ปัญหาชุมชนค้าง "+state.probs.length+" เรื่อง");
+}
+function openProblemList(){
+  if(!state.probs.length){openPanel('<h2 id="panelTitle">ปัญหาชุมชน</h2><p>ตอนนี้ไม่มีปัญหาค้าง</p><p class="from">แก้แล้ว '+state.solved+' เรื่อง ใช้วิธีอนุรักษ์ '+state.solvedC+' เรื่อง</p>');return;}
+  var btns=state.probs.map(function(id){var P=probDef(id);return{label:"แก้: "+P.title,fn:function(){openProblem(id,false);}};});
+  btns.push({label:"ปิด",ghost:true});
+  openPanel('<h2 id="panelTitle">ปัญหาชุมชนที่ค้างอยู่</h2><ul>'+state.probs.map(function(id){var P=probDef(id);return'<li><b>'+esc(P.title)+'</b> <span class="harm">'+esc(P.harm)+'</span></li>';}).join("")+'</ul>',btns);
+}
+
+/* ---------- state ---------- */
+var R=null, N=null, state=null, tool=null, tiles=[], running=false;
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function clamp(v){return Math.max(0,Math.min(100,v));}
+function esc(s){return String(s).replace(/[&<>"]/g,function(m){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m];});}
+function nm(t){if(DECO_ALL[t])return DECO_ALL[t].name;if(t==="wat")return"วัด";if(t==="sala")return"ศาลาการเปรียญ";if(t==="mall")return"ห้างสรรพสินค้า";return R.names[t];}
+function icon(t){if(DECO_ALL[t])return DI[DECO_ALL[t].icon];if(t==="hut"||t==="wat"||t==="sala"||t==="mall")return I[t];return I[R.icons[t]];}
+function note(t){
+  if(DECO_ALL[t])return "ของตกแต่ง"+(DECO_ALL[t].water?" วางในคลอง":"");
+  return {hut:"ราคาถูก แต่ไม่ทน"+R.hazard.name,home:"ทน"+R.hazard.name,wat:"ที่ทำบุญ",sala:"ที่ทำบุญ วางติดวัดได้โบนัส",
+   market:"ที่ค้าขาย"+(R.marketWater?" วางในคลอง":""),stage:"ที่เล่นและชมการแสดง",craft:"หัตถกรรม วางติด"+R.names.home+"ได้โบนัส",mall:"ได้วัสดุเร็ว แต่วัฒนธรรมลด"}[t];
+}
+function fresh(regionId,mode,mid){
+  var g=[];for(var i=0;i<COLS*ROWS;i++)g.push(null);
+  var qo=[];for(var k=0;k<R_ALL[regionId].questions.length;k++)qo.push(k);
+  return {v:1,region:regionId,mode:mode,mid:mid||null,mat:mode==="mission"?80:50,happy:70,cult:30,trust:50,season:0,sec:0,grid:g,acts:{},cards:{},
+    qOrder:shuffle(qo),qi:0,started:false,over:false,hazLost:0,hazDone:false,hazLevel:-1,used:[],mission:null,missionsDone:[],
+    streak:0,correct:0,asked:0,festHeld:{},festPerfect:{},ritual:false,marketStop:-1,lost:false,
+    probs:[],probUsed:[],solved:0,solvedC:0,cons:{},broken:-1,reason:"",crowdOff:false};
+}
+function saveKey(){return PREFIX+state.region;}
+function save(){if(!state||state.mode!=="free")return;try{localStorage.setItem(saveKey(),JSON.stringify(state));}catch(e){}}
+function loadSaved(regionId){try{var raw=localStorage.getItem(PREFIX+regionId);if(!raw)return null;var s=JSON.parse(raw);if(s&&s.v===1&&s.grid&&s.grid.length===COLS*ROWS)return s;}catch(e){}return null;}
+function clearSaved(regionId){try{localStorage.removeItem(PREFIX+regionId);}catch(e){}}
+
+/* ---------- grid helpers ---------- */
+function isWater(i){return Math.floor(i/COLS)===CANAL_ROW;}
+function nb(i){var r=Math.floor(i/COLS),c=i%COLS,o=[];if(r>0)o.push(i-COLS);if(r<ROWS-1)o.push(i+COLS);if(c>0)o.push(i-1);if(c<COLS-1)o.push(i+1);return o;}
+function adjType(i,t){return nb(i).some(function(j){return state.grid[j]&&state.grid[j].type===t;});}
+function adjWater(i){return nb(i).some(isWater);}
+function count(t){var n=0;state.grid.forEach(function(c){if(c&&c.type===t)n++;});return n;}
+function homes(){return count("home")+count("hut");}
+function pop(){return homes()*POP_PER_HOME;}
+function has(need){return state.grid.some(function(c){return c&&BASE[c.type].need===need;});}
+function pairs(a,b){var n=0;state.grid.forEach(function(c,i){if(c&&c.type===a&&adjType(i,b))n++;});return n;}
+function cardTotal(){return CARD_KEYS.filter(function(k){return state.cards[k];}).length;}
+function gainAt(i){
+  var c=state.grid[i],g=BASE[c.type].gain;
+  if(c.type==="home"&&R.riverBonus&&adjWater(i))g+=1;
+  if(c.type==="market"&&R.marketWater&&adjType(i,"home"))g+=2;
+  if(c.type==="craft"&&adjType(i,"home"))g+=2;
+  return g;
+}
+function bonusIf(t,i){
+  if(t==="home"&&R.riverBonus&&adjWater(i))return "เรือนริมคลองได้วัสดุเพิ่ม ชุมชนภาคกลางนิยมตั้งบ้านเรือนริมแม่น้ำลำคลอง";
+  if(t==="market"&&R.marketWater&&adjType(i,"home"))return "ตลาดน้ำติดเรือนได้วัสดุเพิ่ม ชาวบ้านพายเรือจากเรือนมาค้าขาย";
+  if(t==="craft"&&adjType(i,"home"))return "หัตถกรรมติดเรือนได้วัสดุเพิ่ม งานหัตถกรรมทำกันในครัวเรือน";
+  if(t==="sala"&&adjType(i,"wat"))return "ศาลาการเปรียญติดวัด ความสุขเพิ่มทุกฤดู เพราะศาลาการเปรียญเป็นอาคารในวัด";
+  if(t==="wat"&&adjType(i,"sala"))return "วัดติดศาลาการเปรียญ ความสุขเพิ่มทุกฤดู";
+  if(t==="home"&&adjType(i,"craft"))return "เรือนติดงานหัตถกรรม หัตถกรรมได้วัสดุเพิ่ม";
+  return "";
+}
+function validSpot(t,i){
+  if(state.grid[i])return false;
+  var w=(t==="market"&&R.marketWater)||!!BASE[t].water;
+  return w?isWater(i):!isWater(i);
+}
+
+/* ---------- DOM ---------- */
+var $=function(id){return document.getElementById(id);};
+var board=$("board"), statusEl=$("status"), toolsEl=$("tools");
+var layer=document.createElement("div");layer.className="layer";
+var fxEl=document.createElement("div");fxEl.className="fx";
+for(var i=0;i<COLS*ROWS;i++){
+  var b=document.createElement("button");
+  b.className="tile"+(isWater(i)?" water":"");
+  b.setAttribute("data-i",i);
+  b.addEventListener("click",onTile);
+  board.appendChild(b);tiles.push(b);
+}
+board.appendChild(layer);board.appendChild(fxEl);
+var boats=[];
+["b1","b2"].forEach(function(c){var s=document.createElement("span");s.className="boat "+c;s.innerHTML=I.smallboat;layer.appendChild(s);boats.push(s);});
+var walkers=[];
+for(var w=0;w<6;w++){var s=document.createElement("span");s.className="walker";s.style.display="none";layer.appendChild(s);walkers.push(s);}
+var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function say(msg,kind){statusEl.textContent=msg;statusEl.className="status"+(kind?" "+kind:"");}
+
+function buildTools(){
+  toolsEl.innerHTML="";
+  var db=document.createElement("button");db.className="tool";db.setAttribute("aria-pressed","false");db.setAttribute("data-k","deco");
+  db.innerHTML=DI.bodhi+"<span>ของตกแต่ง</span><small>ปลดล็อกด้วยความรู้</small>";
+  db.addEventListener("click",openDecoPanel);
+  ORDER.concat(["erase"]).forEach(function(k){
+    var t=document.createElement("button");
+    t.className="tool";t.setAttribute("aria-pressed","false");t.setAttribute("data-k",k);
+    t.innerHTML=k==="erase"?I.erase+"<span>รื้อถอน</span><small>คืนวัสดุครึ่งหนึ่ง</small>":icon(k)+"<span>"+esc(nm(k))+"</span><small>"+BASE[k].cost+" วัสดุ</small>";
+    t.addEventListener("click",function(){selectTool(tool===k?null:k);});
+    toolsEl.appendChild(t);
+  });
+  toolsEl.insertBefore(db,toolsEl.lastChild);
+}
+function ensureNew(){state.setsDone=state.setsDone||{};state.decoUn=state.decoUn||{};}
+function decoUnlock(k){ensureNew();if(state.decoUn[k]||DECO_BY[state.region].indexOf(k)<0)return;state.decoUn[k]=true;say("ปลดล็อกของตกแต่ง: "+DECO_ALL[k].name+" กดปุ่มของตกแต่งเพื่อวาง","ok");}
+function openDecoPanel(){
+  ensureNew();
+  var list=DECO_BY[state.region];
+  var btns=list.map(function(k){var D=DECO_ALL[k],un=state.decoUn[k],full=count(k)>=3;
+    return{label:un?D.name+" ("+D.cost+" วัสดุ)"+(full?" ครบ 3 ชิ้นแล้ว":""):"ยังล็อก: "+D.name+" ("+D.hint+")",ghost:!un,disabled:!un||full,fn:function(){selectTool(k);}};});
+  btns.push({label:"ปิด",ghost:true});
+  openPanel('<h2 id="panelTitle">ของตกแต่ง</h2><p class="from">วางได้ชนิดละไม่เกิน 3 ชิ้น ทุกชนิดที่มีในหมู่บ้านให้ความสุข +1 ต่อฤดู</p>',btns);
+}
+function intactSets(){return SETS[state.region].filter(function(S){return S.check();});}
+function checkSets(){
+  ensureNew();
+  SETS[state.region].forEach(function(S,idx){
+    if(state.setsDone[S.id]||!S.check())return;
+    state.setsDone[S.id]=true;
+    Object.keys(DECO_ALL).forEach(function(k){if(DECO_ALL[k].unlock.set===S.id)decoUnlock(k);});
+    openPanel('<p class="from">ชุดหมู่บ้านครบแล้ว</p><h2 id="panelTitle">'+esc(S.name)+'</h2><p>'+esc(S.card.b)+'</p><p class="from">ได้ความสุข +2 ทุกฤดูที่ชุดนี้ยังอยู่ครบ และปลดล็อกของตกแต่งใหม่</p>');
+  });
+}
+function selectTool(k){
+  tool=k;
+  Array.prototype.forEach.call(toolsEl.children,function(x){var dk=x.getAttribute("data-k");x.setAttribute("aria-pressed",(dk===tool||(dk==="deco"&&tool&&DECO_ALL[tool]))?"true":"false");});
+  if(!tool)say("แตะสิ่งก่อสร้างในหมู่บ้านเพื่ออ่านบัตรความรู้");
+  else if(tool==="erase")say("แตะสิ่งก่อสร้างที่ต้องการรื้อถอน");
+  else say(nm(tool)+" ("+note(tool)+") ช่องกรอบสีทองได้โบนัส");
+  renderBonus();
+}
+function renderBonus(){
+  tiles.forEach(function(el,i){
+    var on=!!(tool&&tool!=="erase"&&state&&validSpot(tool,i)&&bonusIf(tool,i));
+    el.classList.toggle("bonus",on);
+  });
+}
+
+function render(){
+  if(!state)return;
+  var ph=state.season%3, y=Math.floor(Math.min(state.season,total()-1)/3)+1;
+  $("seasonName").textContent=state.over?"จบเกม":"ปีที่ "+y+" "+R.seasons[ph];
+  $("seasonLeft").textContent=state.over?"":"ฤดูที่ "+(state.season+1)+" จาก "+total();
+  $("seasonBar").style.width=(state.over?100:(state.sec/SEASON_SEC*100))+"%";
+  board.className="board s"+ph;
+  $("mat").textContent=state.mat;$("pop").textContent=pop();
+  $("happy").textContent=state.happy;$("cult").textContent=state.cult;$("trust").textContent=state.trust;
+  $("happyBox").className="stat"+(state.happy<30?" low":"");
+  $("cultBox").className="stat"+(state.cult<30?" low":"");
+  $("trustBox").className="stat"+(state.trust<30?" low":"");
+  $("bookBtn").textContent="สมุดภาพ "+cardTotal()+"/"+CARD_KEYS.length;
+  var pb=$("probBtn");pb.textContent="ปัญหาชุมชน"+(state.probs.length?" ค้าง "+state.probs.length+" เรื่อง":" (ไม่มีปัญหาค้าง)");pb.className="btn"+(state.probs.length?" alert":" ghost");
+  var ml=$("missionLine");
+  if(state.mode==="mission"){var M=missionDef(state.mid);ml.textContent="ภารกิจ: "+M.title;ml.className="mission";}
+  else if(state.mission){ml.textContent=(state.mission.done?"สำเร็จแล้ว: ":"ภารกิจฤดูนี้: ")+state.mission.text+(state.mission.done?"":" (รางวัล 15 วัสดุ)");ml.className="mission"+(state.mission.done?" done":"");}
+  else ml.textContent="";
+  tiles.forEach(function(el,i){
+    var c=state.grid[i],want=c?c.type:"";
+    if(el.getAttribute("data-type")!==want){
+      var fl=el.querySelector(".float");el.innerHTML=c?icon(c.type):"";if(fl)el.appendChild(fl);el.setAttribute("data-type",want);
+    }
+    el.classList.toggle("broken",i===state.broken&&!!c);
+    el.setAttribute("aria-label",(i===state.broken&&c?"ทรุดโทรม ":"")+(c?nm(c.type):(isWater(i)?"คลอง ว่าง":"ที่ดิน ว่าง"))+" แถว "+(Math.floor(i/COLS)+1)+" ช่อง "+(i%COLS+1));
+  });
+  renderBonus();
+}
+function total(){return state.mode==="mission"?missionDef(state.mid).seasons:SEASONS;}
+
+/* ---------- panel with queue ---------- */
+var overlay=$("overlay"),pBody=$("panelBody"),pAct=$("panelActions"),dismissable=true,queue=[];
+function panelOpen(){return overlay.classList.contains("show");}
+function openPanel(html,buttons,canDismiss){
+  if(panelOpen()){queue.push([html,buttons,canDismiss]);return;}
+  pBody.innerHTML=html;pAct.innerHTML="";dismissable=canDismiss!==false;
+  (buttons||[{label:"ปิด"}]).forEach(function(bt){
+    var b=document.createElement("button");b.className="btn"+(bt.ghost?" ghost":"");b.textContent=bt.label;
+    if(bt.disabled)b.disabled=true;
+    b.addEventListener("click",function(){
+      if(bt.keep){bt.fn();return;}
+      overlay.classList.remove("show");if(bt.fn)bt.fn();next();
+    });
+    pAct.appendChild(b);
+  });
+  overlay.classList.add("show");pBody.scrollTop=0;overlay.querySelector(".panel").scrollTop=0;
+  var f=pAct.querySelector("button");if(f)f.focus({preventScroll:true});
+}
+function next(){if(!panelOpen()&&queue.length){var q=queue.shift();openPanel(q[0],q[1],q[2]);}}
+function closePanel(){overlay.classList.remove("show");next();}
+overlay.addEventListener("click",function(e){if(e.target===overlay&&dismissable)closePanel();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dismissable&&panelOpen())closePanel();});
+
+/* ---------- cards ---------- */
+function unlock(key,show){
+  if(state.cards[key])return false;
+  state.cards[key]=true;
+  (DECO_BY[state.region]||[]).forEach(function(k){if(DECO_ALL[k].unlock.card===key)decoUnlock(k);});
+  var C=R.cards[key];
+  if(show)openPanel('<p class="from">ปลดล็อกบัตรความรู้ใหม่</p><h2 id="panelTitle">'+esc(C.t)+'</h2><p>'+esc(C.b)+'</p>');
+  else say("ปลดล็อกบัตรความรู้ใหม่: "+C.t+" เปิดอ่านในสมุดภาพ","ok");
+  return true;
+}
+function lockHint(k){
+  var F=R.festivals;
+  return {homePlace:"วาง"+R.names.home,homeHazard:"ผ่าน"+R.hazard.name+"โดยมี"+R.names.home+"อย่างน้อย 1 หลัง",wat:"วางวัด",sala:"วางศาลาการเปรียญ",
+   market:"วาง"+R.names.market,food:"ให้ชาวบ้าน"+R.acts.market+"ครบ "+ACT_GOAL+" ครั้ง",stage:"วาง"+R.names.stage,music:"ให้ชาวบ้าน"+R.acts.stage+"ครบ "+ACT_GOAL+" ครั้ง",
+   craft:"วาง"+R.names.craft,dress:"ให้ชาวบ้าน"+R.acts.craft+"ครบ "+ACT_GOAL+" ครั้ง",fest0:"จัดงาน"+F[0].name,fest1:"จัดงาน"+F[1].name,belief:R.beliefHint,speech:R.speechHint}[k];
+}
+function cardHTML(k){
+  var C=R.cards[k];
+  if(state.cards[k])return '<div class="card"><b>'+esc(C.t)+'</b><p>'+esc(C.b)+'</p></div>';
+  return '<div class="card locked"><b>ยังไม่ปลดล็อก</b><p>'+esc(lockHint(k))+'</p></div>';
+}
+function openBook(){
+  var groups=[["วัตถุธรรม: ที่อยู่อาศัย",["homePlace","homeHazard"]],["วัตถุธรรม: วัดและศาสนสถาน",["wat","sala"]],["วัตถุธรรม: ตลาดและอาหาร",["market","food"]],
+   ["อวัตถุธรรม: การละเล่น การแสดง ดนตรี",["stage","music"]],["วัตถุธรรม: หัตถกรรมและการแต่งกาย",["craft","dress"]],["อวัตถุธรรม: ประเพณี",["fest0","fest1"]],
+   ["อวัตถุธรรม: ความเชื่อ",["belief"]],["อวัตถุธรรม: ภาษาและมารยาท",["speech"]]];
+  var h='<h2 id="panelTitle">สมุดภาพวัฒนธรรม '+esc(R.name)+'</h2><p class="count">ปลดล็อกแล้ว '+cardTotal()+' จาก '+CARD_KEYS.length+' บัตร</p>';
+  groups.forEach(function(g){h+='<h3>'+esc(g[0])+'</h3>';g[1].forEach(function(k){h+=cardHTML(k);});});
+  ensureNew();
+  h+='<h3>ชุดหมู่บ้าน</h3>';
+  SETS[state.region].forEach(function(S){h+=state.setsDone[S.id]?'<div class="card"><b>'+esc(S.card.t)+'</b><p>'+esc(S.card.b)+'</p></div>':'<div class="card locked"><b>ชุด ??? ยังไม่ค้นพบ</b><p>ใบ้: '+esc(S.cond)+'</p></div>';});
+  var pd=problemDefs(),got=pd.filter(function(p){return state.cons[p.id];});
+  h+='<h3>การอนุรักษ์ (แก้ปัญหาชุมชนแบบอนุรักษ์แล้ว '+got.length+' จาก '+pd.length+')</h3>';
+  if(!got.length)h+='<div class="card locked"><b>ยังไม่ปลดล็อก</b><p>แก้ปัญหาชุมชนด้วยวิธีอนุรักษ์และปรับตัว</p></div>';
+  got.forEach(function(p){h+='<div class="card"><b>'+esc(p.card.t)+'</b><p>'+esc(p.card.b)+'</p></div>';});
+  openPanel(h);
+}
+function showType(t){
+  if(DECO_ALL[t]){openPanel('<h2 id="panelTitle">'+esc(nm(t))+'</h2><p class="from">ของตกแต่ง</p><p>'+esc(DECO_ALL[t].fact)+'</p>');return;}
+  var map={home:["homePlace","homeHazard"],wat:["wat"],sala:["sala"],market:["market","food"],stage:["stage","music"],craft:["craft","dress"]};
+  var h='<h2 id="panelTitle">'+esc(nm(t))+'</h2><p class="from">'+esc(note(t))+(R.acts[t]?" ชาวบ้าน"+esc(R.acts[t])+"แล้ว "+(state.acts[t]||0)+" ครั้ง":"")+'</p>';
+  (map[t]||[]).forEach(function(k){h+=cardHTML(k);});
+  openPanel(h);
+}
+
+/* ---------- placing ---------- */
+function onTile(e){
+  if(!state)return;
+  var i=+e.currentTarget.getAttribute("data-i"),c=state.grid[i];
+  if(state.over){say("เกมจบแล้ว กดเริ่มใหม่หรือกลับเมนู","warn");return;}
+  if(!tool){if(c)showType(c.type);else say("เลือกสิ่งก่อสร้างด้านล่างก่อน แล้วแตะช่องว่างเพื่อวาง");return;}
+  if(tool==="erase"){
+    if(!c){say("ช่องนี้ว่างอยู่แล้ว","warn");return;}
+    var back=Math.floor(BASE[c.type].cost/2);state.mat+=back;state.grid[i]=null;
+    if(i===state.broken){state.broken=-1;state.probs=state.probs.filter(function(x){return x!=="decay";});}
+    say("รื้อถอน"+nm(c.type)+"แล้ว ได้วัสดุคืน "+back,"ok");save();render();return;
+  }
+  var B=BASE[tool];
+  if(c){say("ช่องนี้มีสิ่งก่อสร้างแล้ว เลือกช่องว่าง","warn");return;}
+  var wOnly=(tool==="market"&&R.marketWater)||!!B.water;
+  if(wOnly&&!isWater(i)){say(nm(tool)+"ต้องวางบนช่องคลอง","warn");return;}
+  if(!wOnly&&isWater(i)){say(nm(tool)+"ต้องวางบนบก ไม่ใช่ในคลอง","warn");return;}
+  if(B.deco&&count(tool)>=3){say(nm(tool)+"วางได้ไม่เกิน 3 ชิ้น","warn");return;}
+  if(state.mat<B.cost){say("วัสดุไม่พอ ต้องใช้ "+B.cost+" มีอยู่ "+state.mat,"warn");return;}
+  var bonus=bonusIf(tool,i);
+  state.mat-=B.cost;state.grid[i]={type:tool,t:0};
+  if(B.deco){say("วาง"+nm(tool)+"แล้ว: "+DECO_ALL[tool].fact,"ok");save();render();checkSets();return;}
+  say("วาง"+nm(tool)+"แล้ว"+(bonus?" โบนัส: "+bonus:"")+(B.tempt?" ค่าวัฒนธรรมจะลดลงทุกฤดูที่ห้างยังอยู่":""),B.tempt?"warn":"ok");
+  var keyMap={home:"homePlace",wat:"wat",sala:"sala",market:"market",stage:"stage",craft:"craft"};
+  if(keyMap[tool])unlock(keyMap[tool],true);
+  if(tool==="home"&&!state.ritual){state.ritual=true;ritualNewHome();}
+  save();render();checkSets();
+}
+function ritualNewHome(){
+  openPanel('<p class="from">ความเชื่อและพิธีกรรม</p><h2 id="panelTitle">ทำบุญขึ้นบ้านใหม่</h2><p>'+esc(R.names.home)+'หลังแรกสร้างเสร็จแล้ว ชาวบ้านถามว่าจะทำบุญขึ้นบ้านใหม่หรือไม่</p>',[
+    {label:"ทำบุญ (ใช้ 5 วัสดุ)",fn:function(){
+      state.mat=Math.max(0,state.mat-5);state.trust=clamp(state.trust+5);
+      if(R.beliefTrigger==="newhome")unlock("belief",true);else say("ทำบุญขึ้นบ้านใหม่แล้ว ความไว้ใจเพิ่ม 5","ok");
+      save();render();}},
+    {label:"ไม่ทำ",ghost:true,fn:function(){say("ไม่ได้ทำบุญขึ้นบ้านใหม่");}}
+  ],false);
+}
+
+/* ---------- questions ---------- */
+function presentQuestion(Q,cb){
+  var head='<p class="from">ชาวบ้านมาถาม</p><h2 id="panelTitle">'+esc(Q.q)+'</h2>';
+  function feedback(ok,answerHTML){
+    var h='<h2 id="panelTitle">'+(ok?"ถูกต้อง":"ยังไม่ถูก")+'</h2>';
+    if(!ok)h+='<p>คำตอบที่ถูก</p>'+answerHTML;
+    if(Q.ind)h+='<p class="ind">'+esc(indText(Q.ind))+'</p>';
+    openPanel(h,[{label:"ต่อไป",fn:function(){cb(ok);}}],false);
+  }
+  if(Q.type==="choice"){
+    var right=Q.a[0];
+    openPanel(head,shuffle(Q.a).map(function(o){return{label:o,ghost:true,fn:function(){feedback(o===right,'<p>'+esc(right)+'</p>');}};}),false);
+  }else if(Q.type==="match"){
+    var rights=shuffle(Q.pairs.map(function(p){return p[1];}));
+    var h=head+'<p class="from">เลือกคำตอบให้ครบทุกข้อ</p>';
+    Q.pairs.forEach(function(p,k){
+      h+='<div class="mrow"><label for="m'+k+'">'+esc(p[0])+'</label><select id="m'+k+'"><option value="">เลือก</option>'+rights.map(function(r){return'<option>'+esc(r)+'</option>';}).join("")+'</select></div>';
+    });
+    openPanel(h,[{label:"ส่งคำตอบ",fn:function(){
+      var ok=Q.pairs.every(function(p,k){return $("m"+k).value===p[1];});
+      feedback(ok,'<ul>'+Q.pairs.map(function(p){return'<li>'+esc(p[0])+' คู่กับ '+esc(p[1])+'</li>';}).join("")+'</ul>');
+    }}],false);
+  }else if(Q.type==="order"){
+    var cur=shuffle(Q.items);var tries=0;while(cur.join("|")===Q.items.join("|")&&tries<10){cur=shuffle(Q.items);tries++;}
+    openPanel(head+'<p class="from">กดลูกศรเพื่อเลื่อนให้เรียงจากบนลงล่าง</p><div id="olist"></div>',[{label:"ส่งคำตอบ",fn:function(){
+      var ok=cur.join("|")===Q.items.join("|");
+      feedback(ok,'<ol>'+Q.items.map(function(x){return'<li>'+esc(x)+'</li>';}).join("")+'</ol>');
+    }}],false);
+    var drawO=function(){
+      var box=$("olist");if(!box)return;box.innerHTML="";
+      cur.forEach(function(x,k){
+        var row=document.createElement("div");row.className="orow";
+        row.innerHTML='<span>'+(k+1)+'. '+esc(x)+'</span>';
+        var up=document.createElement("button");up.textContent="▲";up.setAttribute("aria-label","เลื่อนขึ้น");up.disabled=k===0;
+        var dn=document.createElement("button");dn.textContent="▼";dn.setAttribute("aria-label","เลื่อนลง");dn.disabled=k===cur.length-1;
+        up.onclick=function(){var t=cur[k-1];cur[k-1]=cur[k];cur[k]=t;drawO();};
+        dn.onclick=function(){var t=cur[k+1];cur[k+1]=cur[k];cur[k]=t;drawO();};
+        row.appendChild(up);row.appendChild(dn);box.appendChild(row);
+      });
+    };
+    drawO();
+  }
+}
+function seasonQuestion(){
+  if(state.qi>=state.qOrder.length)return;
+  var Q=R.questions[state.qOrder[state.qi]];state.qi++;state.asked++;save();
+  presentQuestion(Q,function(ok){
+    if(ok){
+      state.correct++;state.streak++;state.mat+=10;
+      var extra="";
+      if(state.streak>0&&state.streak%3===0){state.mat+=10;extra=" ตอบถูกติดกัน 3 ข้อ ได้โบนัสอีก 10";decoUnlock("d_bodhi");}
+      if(Q.dialect&&R.speechTrigger==="dialect")unlock("speech",false);
+      say("ตอบถูก ได้วัสดุ 10"+extra,"ok");
+      if(state.mission&&state.mission.id==="m_quiz"&&!state.mission.done)completeMission();
+    }else{state.streak=0;var lose=Math.min(5,state.mat);state.mat-=lose;say("ตอบผิด เสียวัสดุ "+lose,"warn");}
+    save();render();
+  });
+}
+
+/* ---------- festivals ---------- */
+function festivalFor(ph){for(var k=0;k<R.festivals.length;k++)if(R.festivals[k].phase===ph)return k;return -1;}
+function holdFestival(k){
+  var F=R.festivals[k],key="fest"+k,yr=Math.floor(state.season/3);
+  if(state.festHeld[key+"-"+yr])return;
+  state.festHeld[key+"-"+yr]=true;save();
+  if(pop()===0){say("ถึง"+F.name+"แล้ว แต่ยังไม่มีชาวบ้าน จึงจัดงานไม่ได้","warn");return;}
+  if(active("gap")){state.happy=clamp(state.happy-5);say("ผู้ใหญ่กับเด็กยังตกลงกันไม่ได้ จึงจัด"+F.name+"ไม่ได้ ความสุข −5 แก้ปัญหาช่องว่างระหว่างวัยก่อน","warn");return;}
+  var opts=shuffle(F.ok.concat(F.bad.map(function(b){return b[0];})));
+  var sel={};
+  var h='<p class="from">ประเพณีตามฤดู</p><h2 id="panelTitle">ถึงเทศกาล'+esc(F.name)+'</h2><p>ชาวบ้านอยากจัดงาน เลือกกิจกรรมที่เป็นของงานนี้ให้ครบ และไม่เลือกสิ่งที่ไม่ใช่</p><div class="opts" id="fopts"></div>';
+  var canPay=state.mat>=10;
+  openPanel(h,[
+    {label:canPay?"จัดงาน (ใช้ 10 วัสดุ)":"วัสดุไม่พอ จัดงานไม่ได้",disabled:!canPay,fn:function(){
+      state.mat-=10;
+      var picked=opts.filter(function(o){return sel[o];});
+      var okPick=picked.filter(function(o){return F.ok.indexOf(o)>=0;});
+      var badPick=F.bad.filter(function(b){return sel[b[0]];});
+      var perfect=okPick.length===F.ok.length&&badPick.length===0;
+      var r='<h2 id="panelTitle">'+(perfect?"จัดงานได้ครบถูกต้อง":"จัดงานแล้ว แต่ยังไม่สมบูรณ์")+'</h2>';
+      if(perfect){state.happy=clamp(state.happy+10);state.trust=clamp(state.trust+10);state.cult=clamp(state.cult+5);state.festPerfect[key]=true;r+='<p>ความสุข +10 ความไว้ใจ +10 วัฒนธรรม +5</p>';}
+      else{
+        state.happy=clamp(state.happy+5);
+        var miss=F.ok.filter(function(o){return !sel[o];});
+        if(miss.length)r+='<p>ยังขาด: '+esc(miss.join(", "))+'</p>';
+        if(badPick.length){state.cult=clamp(state.cult-5);r+='<p>เลือกสิ่งที่ไม่ใช่ของงานนี้ วัฒนธรรม −5</p><ul>'+badPick.map(function(b){return'<li>'+esc(b[0])+': '+esc(b[1])+'</li>';}).join("")+'</ul>';}
+        r+='<p>ความสุข +5</p>';
+      }
+      openPanel(r,[{label:"ต่อไป",fn:function(){unlock(key,true);if(R.beliefTrigger==="fest")unlock("belief",true);
+        if(state.mission&&state.mission.id==="m_fest"&&!state.mission.done)completeMission();save();render();}}],false);
+      save();render();
+    }},
+    {label:"ไม่จัดงาน",ghost:true,fn:function(){state.happy=clamp(state.happy-5);say("ไม่ได้จัด"+F.name+" ชาวบ้านผิดหวัง ความสุขลด 5","warn");save();render();}}
+  ],false);
+  var box=$("fopts");
+  opts.forEach(function(o){
+    var b=document.createElement("button");b.className="opt";b.textContent=o;b.setAttribute("aria-pressed","false");
+    b.onclick=function(){sel[o]=!sel[o];b.setAttribute("aria-pressed",sel[o]?"true":"false");};
+    box.appendChild(b);
+  });
+}
+
+/* ---------- random events ---------- */
+function eventPool(){
+  var ph=state.season%3, ev=[];
+  if(count("wat")>0)ev.push({id:"restore",title:"วัดขอวัสดุบูรณะ",body:"ศาลาและกุฏิในวัดทรุดโทรม เจ้าอาวาสขอวัสดุ 20 ไปบูรณะ",ch:[
+    {label:"ให้วัสดุ 20",need:20,fn:function(){state.mat-=20;state.happy=clamp(state.happy+10);state.cult=clamp(state.cult+5);say("ร่วมบูรณะวัด ความสุข +10 วัฒนธรรม +5","ok");}},
+    {label:"ไม่ให้",fn:function(){state.happy=clamp(state.happy-5);say("ไม่ได้ร่วมบูรณะวัด ความสุข −5","warn");}}]});
+  if(count("wat")+count("sala")>0)ev.push({id:"merit",title:"ชาวบ้านขอจัดงานบุญ",body:"ชาวบ้านอยากจัดงานบุญประจำหมู่บ้าน ต้องใช้วัสดุ 15",ch:[
+    {label:"จัดงานบุญ (15 วัสดุ)",need:15,fn:function(){state.mat-=15;state.happy=clamp(state.happy+10);say("จัดงานบุญแล้ว ความสุข +10","ok");}},
+    {label:"ไม่จัด",fn:function(){state.happy=clamp(state.happy-5);say("ไม่ได้จัดงานบุญ ความสุข −5","warn");}}]});
+  if(count("stage")>0)ev.push({id:"investor",title:"นายทุนขอซื้อที่",body:"นายทุนให้วัสดุ 40 แลกกับการรื้อ"+nm("stage")+" 1 แห่ง เพื่อสร้างที่จอดรถ",ch:[
+    {label:"ขาย รับวัสดุ 40",fn:function(){for(var i=0;i<state.grid.length;i++)if(state.grid[i]&&state.grid[i].type==="stage"){state.grid[i]=null;break;}state.mat+=40;state.cult=clamp(state.cult-15);say("ขายที่แล้ว วัฒนธรรม −15","warn");}},
+    {label:"ไม่ขาย",fn:function(){state.cult=clamp(state.cult+5);say("เก็บพื้นที่วัฒนธรรมไว้ วัฒนธรรม +5","ok");}}]});
+  if(count("market")>0)ev.push({id:"tourist",title:"นักท่องเที่ยวมาเยือน",body:"นักท่องเที่ยวมาชม"+nm("market")+"ของหมู่บ้าน",ch:[
+    {label:"ต้อนรับ",fn:function(){var g=count("mall")>0?5:15;state.mat+=g;state.trust=clamp(state.trust+5);say(g===15?"นักท่องเที่ยวชอบวิถีชุมชน ได้วัสดุ 15":"นักท่องเที่ยวไปเดินห้างแทน ได้วัสดุแค่ 5",g===15?"ok":"warn");}}]});
+  if(R.extraEvents.indexOf("dryCanal")>=0&&ph===0&&count("market")>0)ev.push({id:"dry",title:"หน้าแล้ง น้ำในคลองลด",body:"น้ำในคลองลดลงมาก เรือแล่นไม่ได้ ตลาดน้ำต้องหยุดค้าขายจนจบฤดู",ch:[
+    {label:"รับทราบ",fn:function(){state.marketStop=state.season;say("ตลาดน้ำหยุดค้าขายจนจบฤดู","warn");}}]});
+  if(R.extraEvents.indexOf("sukwan")>=0&&pop()>0)ev.push({id:"sukwan",title:"พิธีสู่ขวัญ",body:"ชาวบ้านคนหนึ่งเพิ่งกลับจากทำงานต่างถิ่น ญาติจัดพิธีบายศรีสู่ขวัญ และชวนไปร่วมผูกข้อมือ",ch:[
+    {label:"ไปร่วมพิธี",fn:function(){state.trust=clamp(state.trust+10);if(R.beliefTrigger==="sukwan")unlock("belief",true);else say("ร่วมพิธีสู่ขวัญ ความไว้ใจ +10","ok");}},
+    {label:"ไม่ไป",fn:function(){state.trust=clamp(state.trust-5);say("ไม่ได้ไปร่วมพิธี ความไว้ใจ −5","warn");}}]});
+  VALUES.forEach(function(V){ev.push({id:V.id,value:V});});
+  return ev.filter(function(e){return state.used.indexOf(e.id)<0;});
+}
+function randomEvent(){
+  var pool=eventPool();if(!pool.length)return;
+  var E=pool[Math.floor(Math.random()*pool.length)];state.used.push(E.id);save();
+  if(E.value){
+    var V=E.value,right=V.a[0];
+    openPanel('<p class="from">ค่านิยมและมารยาท</p><h2 id="panelTitle">'+esc(V.title)+'</h2><p>'+esc(V.body)+'</p>',shuffle(V.a).map(function(o){return{label:o,ghost:true,fn:function(){
+      var ok=o===right;
+      if(ok){state.trust=clamp(state.trust+10);if(R.speechTrigger==="values")unlock("speech",false);}else state.trust=clamp(state.trust-5);
+      openPanel('<h2 id="panelTitle">'+(ok?"เหมาะสม ความไว้ใจ +10":"ยังไม่เหมาะสม ความไว้ใจ −5")+'</h2>'+(ok?"":'<p>ควร'+esc(right)+'</p>')+'<p>'+esc(V.why)+'</p>');
+      save();render();}};}),false);
+    return;
+  }
+  openPanel('<p class="from">เหตุการณ์</p><h2 id="panelTitle">'+esc(E.title)+'</h2><p>'+esc(E.body)+'</p>',E.ch.map(function(c){
+    var dis=c.need&&state.mat<c.need;
+    return{label:c.label+(dis?" (วัสดุไม่พอ)":""),disabled:dis,ghost:c!==E.ch[0],fn:function(){c.fn();save();render();}};
+  }),false);
+}
+
+/* ---------- season missions ---------- */
+function missionTemplates(){
+  var ph=state.season%3,H=R.hazard;
+  return [
+   {id:"m_market",text:"สร้าง"+R.names.market,check:function(){return count("market")>0;}},
+   {id:"m_homes",text:"มี"+R.names.home+" 3 หลัง",check:function(){return count("home")>=3;}},
+   {id:"m_salawat",text:"วางศาลาการเปรียญติดวัด",check:function(){return pairs("sala","wat")>0;}},
+   {id:"m_craft",text:"วาง"+R.names.craft+"ติด"+R.names.home,check:function(){return pairs("craft","home")>0;}},
+   {id:"m_stage",text:"สร้าง"+R.names.stage,check:function(){return count("stage")>0;}},
+   {id:"m_pop",text:"มีชาวบ้าน 16 คน",check:function(){return pop()>=16;}},
+   {id:"m_quiz",text:"ตอบคำถามของชาวบ้านให้ถูก",check:function(){return false;}},
+   {id:"m_nohut",text:"ไม่มี"+R.names.hut+"เหลือก่อน"+H.name,phase:H.phase,atEnd:true,check:function(){return count("hut")===0&&homes()>0;}},
+   {id:"m_fest",text:"จัดงานเทศกาลประจำฤดู",festOnly:true,check:function(){return false;}}
+  ].filter(function(m){
+    if(state.missionsDone.indexOf(m.id)>=0)return false;
+    if(m.phase!==undefined&&m.phase!==ph)return false;
+    if(m.festOnly&&festivalFor(ph)<0)return false;
+    return true;
+  });
+}
+function pickMission(){
+  var t=missionTemplates();if(!t.length){state.mission=null;return;}
+  var pref=t.filter(function(m){return m.phase!==undefined||m.festOnly;});
+  var m=(pref.length&&Math.random()<0.6)?pref[0]:t[Math.floor(Math.random()*t.length)];
+  state.mission={id:m.id,text:m.text,done:false};
+}
+function missionCheck(m){var t=missionTemplates().concat([]);for(var k=0;k<t.length;k++)if(t[k].id===m.id)return t[k];return null;}
+function completeMission(){
+  state.mission.done=true;state.missionsDone.push(state.mission.id);state.mat+=15;state.happy=clamp(state.happy+5);
+  say("ภารกิจสำเร็จ: "+state.mission.text+" ได้วัสดุ 15 ความสุข +5","ok");
+}
+
+/* ---------- hazard ---------- */
+function seasonStart(){
+  var ph=state.season%3,H=R.hazard;
+  if(state.mode==="free")pickMission();
+  if(ph===H.phase){
+    var lv;
+    if(state.mode==="mission"&&state.mid==="hz")lv=2;
+    else{var r=Math.random();lv=r<0.3?0:(r<0.7?1:2);}
+    state.hazLevel=lv;
+    say("เริ่ม"+R.seasons[ph]+" พยากรณ์: "+H.when+H.forecast[lv],"warn");
+  }else say("เริ่ม"+R.seasons[ph],"ok");
+}
+function doHazard(){
+  var H=R.hazard,lv=state.hazLevel<0?1:state.hazLevel;
+  var idx=[];state.grid.forEach(function(c,i){if(c&&c.type==="hut")idx.push(i);});
+  var lose=lv===0?0:(lv===1?Math.ceil(idx.length/2):idx.length);
+  shuffle(idx).slice(0,lose).forEach(function(i){state.grid[i]=null;});
+  state.hazLost+=lose;state.hazDone=true;
+  state.happy=clamp(state.happy-5*lose);
+  if(!reduced){fxEl.className="fx "+H.fx;setTimeout(function(){fxEl.className="fx";},2600);}
+  var h='<p class="from">'+esc(H.when)+'</p><h2 id="panelTitle">'+esc(H.title)+'</h2><p>ความรุนแรง: '+["เล็กน้อย","ปานกลาง","หนัก"][lv]+'</p>';
+  h+=lose>0?'<p>'+esc(R.names.hut)+'เสียหาย '+lose+' หลัง ชาวบ้าน '+(lose*POP_PER_HOME)+' คนต้องย้ายออก ความสุข −'+(5*lose)+'</p>':'<p>ไม่มีบ้านเสียหาย</p>';
+  var safe=count("home");
+  if(safe>0)h+='<p>'+esc(R.names.home)+' '+safe+' หลัง'+esc(H.safe)+'</p>';
+  openPanel(h,[{label:"ต่อไป",fn:function(){if(safe>0)unlock("homeHazard",true);save();render();}}],false);
+}
+
+/* ---------- season end ---------- */
+function endSeason(){
+  var ph=state.season%3,notes=[];
+  if(state.mission&&!state.mission.done){var m=missionCheck(state.mission);if(m&&m.atEnd&&m.check())completeMission();}
+  if(ph===R.hazard.phase)doHazard();
+  if(pop()>0){
+    [["merit","ที่ทำบุญ"],["trade","ที่ค้าขาย"],["play","ที่เล่น"]].forEach(function(n){
+      if(has(n[0]))state.happy=clamp(state.happy+5);else{state.happy=clamp(state.happy-5);notes.push("ขาด"+n[1]);}
+    });
+    var sw=pairs("sala","wat");if(sw)state.happy=clamp(state.happy+2*sw);
+  }
+  problemEffects(notes);
+  if(pop()>0){var si=intactSets().length;var dt=DECO_BY[state.region].filter(function(k){return count(k)>0;}).length;state.happy=clamp(state.happy+2*si+dt);}
+  var ct=0;TRAD.forEach(function(t){if(count(t)>0)ct++;});
+  state.cult=clamp(state.cult+3*ct-10*count("mall"));
+  if(state.happy<30&&homes()>0){
+    var gone=-1;for(var i=0;i<state.grid.length;i++)if(state.grid[i]&&state.grid[i].type==="hut"){gone=i;break;}
+    if(gone<0)for(var j=0;j<state.grid.length;j++)if(state.grid[j]&&state.grid[j].type==="home"){gone=j;break;}
+    if(gone>=0){state.grid[gone]=null;notes.push("ความสุขต่ำ ชาวบ้านย้ายออก 1 หลัง");}
+  }
+  state.season++;state.sec=0;
+  var lostNow=state.mode==="free"&&state.season>=2&&homes()===0;
+  if(lostNow||state.season>=total()){state.over=true;state.lost=lostNow;save();render();finish();return;}
+  if(notes.length)setTimeout(function(){say(notes.join(" "),"warn");},50);
+  save();render();
+}
+function finish(){
+  if(state.mode==="mission"){missionEnd();return;}
+  var s=0;
+  if(!state.lost&&pop()>0)s++;
+  if(s&&state.happy>=60&&state.cult>=60&&state.trust>=60&&state.probs.length===0)s++;
+  if(cardTotal()>=CARD_KEYS.length)s++;
+  var st="";for(var k=0;k<3;k++)st+=k<s?"★":'<span class="off">★</span>';
+  var h='<h2 id="panelTitle">'+(state.lost?"หมู่บ้านร้าง":"ครบ 9 ฤดูแล้ว")+'</h2><div class="stars" aria-label="ได้ '+s+' ดาว">'+st+'</div>';
+  if(state.lost)h+='<p>ไม่มีบ้านเหลือ ชาวบ้านย้ายออกทั้งหมด</p>';
+  h+='<ul><li>ชาวบ้าน '+pop()+' คน</li><li>ความสุข '+state.happy+' วัฒนธรรม '+state.cult+' ความไว้ใจ '+state.trust+'</li><li>บ้านเสียหายจาก'+esc(R.hazard.name)+' '+state.hazLost+' หลัง</li><li>ปัญหาชุมชนแก้แล้ว '+state.solved+' เรื่อง (วิธีอนุรักษ์ '+state.solvedC+' เรื่อง) ค้างอยู่ '+state.probs.length+' เรื่อง</li><li>ตอบคำถามถูก '+state.correct+' จาก '+state.asked+' ข้อ</li><li>บัตรความรู้ '+cardTotal()+' จาก '+CARD_KEYS.length+' ใบ</li></ul>';
+  openPanel(h,[{label:"เล่นใหม่",fn:function(){startFree(state.region,true);}},{label:"เปิดสมุดภาพ",ghost:true,fn:openBook},{label:"กลับเมนู",ghost:true,fn:toMenu}],false);
+}
+
+/* ---------- teacher missions ---------- */
+function missionDefs(){
+  var H=R.hazard,F=R.festivals;
+  return [
+   {id:"hz",title:"เตรียมหมู่บ้านรับ"+H.name,seasons:H.phase+1,
+    desc:"ภายใน "+(H.phase+1)+" ฤดู สร้างหมู่บ้านให้มีชาวบ้านอย่างน้อย 8 คน และไม่มีบ้านเสียหายจาก"+H.name+" ครั้งนี้"+H.name+"รุนแรงระดับหนัก",
+    check:function(){return state.hazDone&&state.hazLost===0&&pop()>=8;},
+    fail:function(){return !state.hazDone?"ยังไม่ผ่านภัย":(state.hazLost>0?"มีบ้านเสียหาย "+state.hazLost+" หลัง":"ชาวบ้านไม่ถึง 8 คน");}},
+   {id:"f0",title:"จัดงาน"+F[0].name+"ให้ครบองค์ประกอบ",seasons:F[0].phase+1,
+    desc:"สร้างหมู่บ้านให้มีชาวบ้าน แล้วจัดงาน"+F[0].name+"ให้ครบทุกกิจกรรม และไม่เลือกสิ่งที่ไม่ใช่ของงานนี้",
+    check:function(){return !!state.festPerfect.fest0;},fail:function(){return "จัดงานยังไม่ครบถูกต้อง";}},
+   {id:"f1",title:"จัดงาน"+F[1].name+"ให้ครบองค์ประกอบ",seasons:F[1].phase+1,
+    desc:"สร้างหมู่บ้านให้มีชาวบ้าน แล้วจัดงาน"+F[1].name+"ให้ครบทุกกิจกรรม และไม่เลือกสิ่งที่ไม่ใช่ของงานนี้",
+    check:function(){return !!state.festPerfect.fest1;},fail:function(){return "จัดงานยังไม่ครบถูกต้อง";}},
+   {id:"pb",title:"แก้ปัญหาชุมชนให้ได้ 2 เรื่อง",seasons:3,
+    desc:"ภายใน 3 ฤดู จะมีปัญหาชุมชนเกิดขึ้น 2 เรื่อง แก้ทั้งสองเรื่องด้วยวิธีอนุรักษ์และปรับตัว และหมู่บ้านต้องมีชาวบ้านอยู่ จบแล้วเขียนเหตุผลของการเลือกในใบสรุปผล",
+    check:function(){return state.solvedC>=2&&pop()>0;},
+    fail:function(){return pop()===0?"ไม่มีชาวบ้านในหมู่บ้าน":"แก้ด้วยวิธีอนุรักษ์ได้ "+state.solvedC+" เรื่อง";}}
+  ];
+}
+function missionDef(id){var d=missionDefs();for(var k=0;k<d.length;k++)if(d[k].id===id)return d[k];return d[0];}
+function missionEnd(){
+  var M=missionDef(state.mid),pass=M.check(),reason=pass?"":M.fail();
+  var qs=shuffle(R.questions).slice(0,3),score=0,k=0;
+  openPanel('<h2 id="panelTitle">จบภารกิจ</h2><p>ต่อไปเป็นคำถามท้ายภารกิจ 3 ข้อ</p>',[{label:"เริ่มตอบ",fn:ask}],false);
+  function ask(){
+    if(k>=qs.length){summary();return;}
+    presentQuestion(qs[k],function(ok){if(ok)score++;k++;ask();});
+  }
+  function summary(){
+    var d=new Date().toLocaleDateString("th-TH",{year:"numeric",month:"long",day:"numeric"});
+    recordMission(state.region,state.mid,pass,score,reason);
+    var st=loadRes().student,n=doneCount(),t=allMissions().length;
+    var h='<h2 id="panelTitle">ใบสรุปผลภารกิจ</h2><div class="sheet"><p><b>'+esc(studentLine(st))+'</b></p><p><b>'+esc(R.name)+'</b> ภารกิจ: '+esc(M.title)+'</p>'+
+      '<p>ผลภารกิจ: <b>'+(pass?"ผ่าน":"ยังไม่ผ่าน")+'</b>'+(reason?" ("+esc(reason)+")":"")+'</p>'+
+      '<p>คำถามท้ายภารกิจ: ถูก '+score+' จาก 3 ข้อ</p><p>วันที่ '+esc(d)+'</p>'+
+      (state.mid==="pb"?'<label for="sr">เหตุผลที่เลือกวิธีแก้ปัญหา และผลต่อการอนุรักษ์วัฒนธรรม</label><textarea id="sr"></textarea>':'')+'</div>'+
+      '<p class="from">บันทึกผลแล้ว ทำแล้ว '+n+' จาก '+t+' ภารกิจ'+(n===t?' ครบทุกภารกิจแล้ว':'')+'</p>';
+    var btns=[];
+    if(n===t)btns.push({label:"ดูใบสรุปผลรวม",fn:showReport});
+    btns.push({label:"เล่นภารกิจนี้อีกครั้ง",ghost:true,fn:function(){startMission(state.region,state.mid);}});
+    btns.push({label:"กลับเมนู",ghost:n===t,fn:toMenu});
+    openPanel(h,btns,false);
+    var ta=$("sr");if(ta){var rg=state.region,mi=state.mid;ta.addEventListener("input",function(){saveReason(rg,mi,ta.value);});}
+  }
+}
+
+/* ---------- loop ---------- */
+setInterval(function(){
+  if(!running||!state||!state.started||state.over||panelOpen())return;
+  state.sec++;
+  if(state.sec===1)seasonStart();
+  var p=pop(),ph=state.season%3;
+  state.grid.forEach(function(c,i){
+    if(!c)return;var B=BASE[c.type];if(B.deco)return;
+    if(!B.home&&p===0)return;
+    if(c.type==="market"&&(state.marketStop===state.season||active("canal")))return;
+    if(c.type==="stage"&&(active("online")||active("shadow")))return;
+    if(i===state.broken)return;
+    c.t=(c.t||0)+1;
+    if(c.t>=B.every){
+      c.t=0;var g=gainAt(i);if(c.type==="craft"&&active("youth"))g=Math.max(1,Math.floor(g/2));if(c.type==="home"&&active("water"))g=Math.max(1,Math.floor(g/2));state.mat+=g;state.acts[c.type]=(state.acts[c.type]||0)+1;
+      floatText(i,R.acts[c.type]+" +"+g);
+      var ak={market:"food",stage:"music",craft:"dress"}[c.type];
+      if(ak&&state.acts[c.type]>=ACT_GOAL)unlock(ak,false);
+    }
+  });
+  if(state.mode==="free"&&state.mission&&!state.mission.done){var m=missionCheck(state.mission);if(m&&!m.atEnd&&m.check())completeMission();}
+  if(state.sec===3){
+    if(state.mode==="free"&&SPAWN[state.season])spawnProblem(false);
+    if(state.mode==="mission"&&state.mid==="pb"&&state.season<2)spawnProblem(true);
+  }
+  if(state.mode==="free"&&state.sec===8)randomEvent();
+  if(state.sec===15){var fk=festivalFor(ph);
+    if(fk>=0&&(state.mode==="free"||state.mid==="f"+fk))holdFestival(fk);}
+  if(state.mode==="free"&&state.sec===25)seasonQuestion();
+  if(state.sec>=SEASON_SEC)endSeason();
+  if(!state.over)checkCrowd();
+  save();render();
+},1000);
+
+setInterval(function(){
+  if(!running||!state||reduced)return;
+  var occ=[];state.grid.forEach(function(c,i){if(c)occ.push(i);});
+  var n=pop()>0?Math.min(6,homes()*2):0;
+  walkers.forEach(function(w,k){
+    if(k>=n||!occ.length){w.style.display="none";return;}
+    w.style.display="block";
+    var i=occ[Math.floor(Math.random()*occ.length)],r=Math.floor(i/COLS),c=i%COLS;
+    w.style.left=((c+0.25+Math.random()*0.5)/COLS*100)+"%";
+    w.style.top=((r+0.55+Math.random()*0.35)/ROWS*100)+"%";
+  });
+},3000);
+
+function floatText(i,txt){
+  var f=document.createElement("span");f.className="float";f.textContent=txt;
+  tiles[i].appendChild(f);setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f);},1400);
+}
+
+/* ---------- menu & flow ---------- */
+function goalHTML(){
+  if(state.mode==="mission"){var M=missionDef(state.mid);return '<p class="from">'+esc(R.name)+' โหมดภารกิจ</p><h2 id="panelTitle">'+esc(M.title)+'</h2><p>'+esc(M.desc)+'</p><p>จบภารกิจแล้วมีคำถาม 3 ข้อ และใบสรุปผลให้บันทึกภาพหน้าจอส่งครู</p>';}
+  return '<p class="from">'+esc(R.name)+' โหมดอิสระ</p><h2 id="panelTitle">เป้าหมาย</h2><p>ดูแลหมู่บ้านให้อยู่รอดครบ 9 ฤดู (3 ปี)</p>'+
+   '<div class="card"><b>ดาวดวงที่ 1</b><p>หมู่บ้านอยู่รอดครบ 9 ฤดู และยังมีชาวบ้านอยู่</p></div>'+
+   '<div class="card"><b>ดาวดวงที่ 2</b><p>จบเกมโดยมีความสุข วัฒนธรรม และความไว้ใจ อย่างละ 60 ขึ้นไป และไม่มีปัญหาชุมชนค้างอยู่</p></div>'+
+   '<div class="card"><b>ดาวดวงที่ 3</b><p>สะสมบัตรความรู้ครบ '+CARD_KEYS.length+' ใบ</p></div>'+
+   '<h3>สิ่งที่ต้องรู้</h3><ul>'+
+   '<li>'+esc(R.hazard.when)+'ทุกปีมี'+esc(R.hazard.name)+' มีพยากรณ์บอกล่วงหน้า '+esc(R.names.hut)+'จะเสียหาย</li>'+
+   '<li>ชาวบ้านต้องมีที่ทำบุญ ที่ค้าขาย และที่เล่น ความสุขต่ำกว่า 30 ชาวบ้านจะย้ายออก</li>'+
+   '<li>วางสิ่งก่อสร้างให้ถูกตำแหน่งได้โบนัส ช่องกรอบสีทองบอกตำแหน่งโบนัส</li>'+
+   '<li>ถึงเทศกาล ต้องเลือกกิจกรรมให้ถูกต้องตามประเพณี</li>'+
+   '<li>สถานการณ์ด้านมารยาท เลือกเหมาะสมแล้วความไว้ใจเพิ่ม</li>'+
+   '<li>ทุกฤดูมีภารกิจย่อย คำถามจากชาวบ้าน และเหตุการณ์ไม่ซ้ำกัน</li>'+
+   '<li>ห้างสรรพสินค้าได้วัสดุเร็ว แต่วัฒนธรรมลด</li>'+
+   '<li>จัดวางสิ่งก่อสร้างให้ตรงกับวิถีชุมชนจริง จะได้ชุดหมู่บ้าน ดูใบ้ในสมุดภาพ</li>'+
+   '<li>ของตกแต่งปลดล็อกจากความรู้และชุดหมู่บ้าน วางเพื่อเพิ่มความสุข</li>'+
+   '<li>ปัญหาชุมชนจะเกิดขึ้นเรื่อยๆ ปีที่ 1 มี 1 เรื่อง ปีที่ 2 มี 2 เรื่อง ปีที่ 3 มี 3 เรื่อง ถ้าไม่แก้จะเสียหายทุกฤดู กดปุ่มปัญหาชุมชนเพื่อแก้ได้ตลอด</li>'+
+   '<li>ถ้าวางบ้านติดกันแน่นจนมีบ้านถูกล้อม 3 ด้าน และไม่มี'+esc(R.names.stage)+' จะเกิดปัญหาชุมชนแออัด</li>'+
+   '<li>ตั้งแต่จบฤดูที่ 2 ถ้าไม่มีบ้านเหลือ ถือว่าแพ้</li></ul>';
+}
+function enterGame(){
+  R=R_ALL[state.region];N=R.names;tool=null;
+  $("menu").classList.add("hidden");$("game").classList.remove("hidden");
+  $("gTitle").textContent="หมู่บ้าน"+R.name;
+  $("gMode").textContent=state.mode==="mission"?"โหมดภารกิจ":"โหมดอิสระ";
+  $("goalBtn").textContent=state.mode==="mission"?"ภารกิจ":"เป้าหมาย";
+  boats.forEach(function(b){b.style.display="block";});
+  buildTools();tiles.forEach(function(el){el.removeAttribute("data-type");});
+  running=true;render();window.scrollTo(0,0);
+}
+function startFree(regionId,forceNew){
+  queue=[];
+  var s=forceNew?null:loadSaved(regionId);
+  if(forceNew)clearSaved(regionId);
+  state=s||fresh(regionId,"free");enterGame();
+  if(!state.started)openPanel(goalHTML(),[{label:"เริ่มเล่น",fn:function(){state.started=true;save();render();}}],false);
+  else if(state.over)finish();
+  else say("เล่นต่อจากที่บันทึกไว้");
+}
+/* ---------- mission results ---------- */
+var RES_KEY=PREFIX+"results";
+function loadRes(){try{var r=JSON.parse(localStorage.getItem(RES_KEY)||"null");if(r&&r.missions)return r;}catch(e){}return{student:null,missions:{}};}
+function saveRes(r){try{localStorage.setItem(RES_KEY,JSON.stringify(r));}catch(e){}}
+function allMissions(){
+  var out=[],keep=R;
+  REGION_ORDER.forEach(function(id){R=R_ALL[id];missionDefs().forEach(function(d){out.push({key:id+"-"+d.id,region:R.name,mid:d.id,title:d.title});});});
+  R=keep;return out;
+}
+function doneCount(){var r=loadRes();return allMissions().filter(function(m){return r.missions[m.key];}).length;}
+function updateReportBtn(){var n=doneCount(),t=allMissions().length;$("reportBtn").textContent="ผลโหมดภารกิจ ทำแล้ว "+n+"/"+t+(n===t?" ครบแล้ว ดูใบสรุปผลรวม":"");}
+function studentLine(st){return st?"ชื่อ "+st.name+(st.cls?" ชั้น "+st.cls:"")+(st.no?" เลขที่ "+st.no:""):"";}
+function studentPrompt(cb,msg){
+  var st=loadRes().student||{name:"",cls:"",no:""};
+  openPanel('<h2 id="panelTitle">กรอกข้อมูลผู้เล่น</h2><p class="from">กรอกครั้งเดียว ใช้กับทุกภารกิจในเครื่องนี้</p>'+(msg?'<p class="harm">'+esc(msg)+'</p>':'')+
+    '<label for="pn">ชื่อ สกุล</label><input id="pn" autocomplete="off" value="'+esc(st.name)+'"><label for="pc">ชั้น</label><input id="pc" autocomplete="off" value="'+esc(st.cls)+'"><label for="pno">เลขที่</label><input id="pno" inputmode="numeric" autocomplete="off" value="'+esc(st.no)+'">',
+    [{label:"บันทึก",fn:function(){
+      var n=$("pn").value.trim(),c=$("pc").value.trim(),no=$("pno").value.trim();
+      if(!n){studentPrompt(cb,"กรุณากรอกชื่อ สกุล");return;}
+      var r=loadRes();r.student={name:n,cls:c,no:no};saveRes(r);updateReportBtn();if(cb)cb();
+    }},{label:"ยกเลิก",ghost:true}],false);
+}
+function recordMission(regionId,mid,pass,score,why){
+  var r=loadRes(),k=regionId+"-"+mid,old=r.missions[k];
+  r.missions[k]={pass:pass,score:score,why:why||"",date:new Date().toLocaleDateString("th-TH",{year:"numeric",month:"short",day:"numeric"}),reason:""};
+  saveRes(r);return !old;
+}
+function saveReason(regionId,mid,text){var r=loadRes(),k=regionId+"-"+mid;if(r.missions[k]){r.missions[k].reason=text;saveRes(r);}}
+function showReport(){
+  running=false;queue=[];overlay.classList.remove("show");
+  var r=loadRes(),ms=allMissions(),done=ms.filter(function(m){return r.missions[m.key];});
+  var full=done.length===ms.length;
+  var passN=done.filter(function(m){return r.missions[m.key].pass;}).length;
+  var sc=done.reduce(function(a,m){return a+r.missions[m.key].score;},0);
+  var h='<div class="report"><h2>'+(full?"ใบสรุปผลโหมดภารกิจ ครบทุกภาค":"ความคืบหน้าโหมดภารกิจ")+'</h2>';
+  h+='<p><b>'+esc(r.student?studentLine(r.student):"ยังไม่ได้กรอกชื่อผู้เล่น")+'</b></p>';
+  h+='<div class="sumbox"><div><b>'+done.length+'/'+ms.length+'</b>ภารกิจที่ทำแล้ว</div><div><b>'+passN+'/'+ms.length+'</b>ภารกิจที่ผ่าน</div><div><b>'+sc+'/'+(ms.length*3)+'</b>คะแนนคำถาม</div></div>';
+  h+='<table class="rtable"><thead><tr><th>ภาค</th><th>ภารกิจ</th><th>ผล</th><th>คะแนน</th><th>วันที่</th></tr></thead><tbody>';
+  ms.forEach(function(m){
+    var x=r.missions[m.key];
+    h+='<tr><td>'+esc(m.region)+'</td><td>'+esc(m.title)+'</td>'+
+      (x?'<td class="'+(x.pass?"pass":"fail")+'">'+(x.pass?"ผ่าน":"ไม่ผ่าน")+'</td><td>'+x.score+'/3</td><td>'+esc(x.date)+'</td>':'<td class="none">ยังไม่ทำ</td><td class="none">–</td><td class="none">–</td>')+'</tr>';
+  });
+  h+='</tbody></table>';
+  var why=ms.filter(function(m){return m.mid==="pb";});
+  h+='<h3>เหตุผลที่เลือกวิธีแก้ปัญหาชุมชน</h3>';
+  why.forEach(function(m){var x=r.missions[m.key];h+='<p><b>'+esc(m.region)+':</b> '+(x?(x.reason?esc(x.reason):'<span class="harm">ไม่ได้เขียนเหตุผล</span>'):'<span class="ind">ยังไม่ทำ</span>')+'</p>';});
+  h+=full?'<p class="from">บันทึกภาพหน้าจอหน้านี้ส่งครู</p>':'<p class="from">ทำให้ครบ '+ms.length+' ภารกิจ หน้านี้จะเป็นใบสรุปผลรวม</p>';
+  h+='</div><div class="row"><button class="btn" id="rBack">กลับเมนู</button><button class="btn ghost" id="rName">แก้ชื่อ</button><button class="btn ghost" id="rClear">ล้างผล</button></div>';
+  var el=$("report");el.innerHTML=h;
+  $("menu").classList.add("hidden");$("game").classList.add("hidden");el.classList.remove("hidden");window.scrollTo(0,0);
+  $("rBack").onclick=function(){el.classList.add("hidden");$("menu").classList.remove("hidden");updateReportBtn();window.scrollTo(0,0);};
+  $("rName").onclick=function(){studentPrompt(showReport);};
+  $("rClear").onclick=function(){openPanel('<h2 id="panelTitle">ล้างผลเพื่อเริ่มนักเรียนคนใหม่?</h2><p>ผลภารกิจทั้งหมดและชื่อผู้เล่นในเครื่องนี้จะถูกลบ ควรบันทึกภาพหน้าจอใบสรุปผลก่อน</p>',
+    [{label:"ล้างผล",fn:function(){saveRes({student:null,missions:{}});showReport();}},{label:"ยกเลิก",ghost:true}]);};
+}
+function startMission(regionId,mid){
+  if(!loadRes().student){studentPrompt(function(){startMission(regionId,mid);});return;}
+  queue=[];state=fresh(regionId,"mission",mid);enterGame();
+  openPanel(goalHTML(),[{label:"เริ่มภารกิจ",fn:function(){state.started=true;render();}}],false);
+}
+function toMenu(){
+  save();running=false;queue=[];overlay.classList.remove("show");
+  $("game").classList.add("hidden");$("report").classList.add("hidden");$("menu").classList.remove("hidden");updateReportBtn();window.scrollTo(0,0);
+}
+function regionMenu(regionId){
+  R=R_ALL[regionId];
+  var s=loadSaved(regionId),ds=missionDefs();
+  var btns=[];
+  if(s&&s.started&&!s.over)btns.push({label:"โหมดอิสระ: เล่นต่อ",fn:function(){startFree(regionId,false);}});
+  btns.push({label:s&&s.started&&!s.over?"โหมดอิสระ: เริ่มใหม่":"โหมดอิสระ",ghost:!!(s&&s.started&&!s.over),fn:function(){startFree(regionId,true);}});
+  ds.forEach(function(d){btns.push({label:"ภารกิจ: "+d.title,ghost:true,fn:function(){startMission(regionId,d.id);}});});
+  btns.push({label:"ปิด",ghost:true});
+  openPanel('<h2 id="panelTitle">'+esc(R.name)+'</h2><p class="from">ภัยประจำภาค: '+esc(R.hazard.name)+' เทศกาล: '+esc(R.festivals[0].name)+' และ'+esc(R.festivals[1].name)+'</p><p>โหมดอิสระ เล่น 9 ฤดู มีดาว 3 ดวง บันทึกความคืบหน้าในเครื่อง</p><p>โหมดภารกิจ สำหรับครูสั่งงาน เล่นสั้น จบด้วยคำถาม 3 ข้อ และใบสรุปผล</p>',btns);
+}
+var regEl=$("regions");
+REGION_ORDER.forEach(function(id){
+  var X=R_ALL[id],b=document.createElement("button");b.className="region";
+  b.innerHTML=I[X.icon]+'<b>'+esc(X.name)+'</b><small>ภัย: '+esc(X.hazard.name)+'<br>'+esc(X.festivals[0].name)+', '+esc(X.festivals[1].name)+'</small>';
+  b.addEventListener("click",function(){regionMenu(id);});
+  regEl.appendChild(b);
+});
+$("menuBtn").addEventListener("click",toMenu);
+$("bookBtn").addEventListener("click",function(){if(state)openBook();});
+$("probBtn").addEventListener("click",function(){if(state)openProblemList();});
+$("reportBtn").addEventListener("click",showReport);
+updateReportBtn();
+$("goalBtn").addEventListener("click",function(){if(state)openPanel(goalHTML());});
+$("resetBtn").addEventListener("click",function(){
+  if(!state)return;
+  openPanel('<h2 id="panelTitle">เริ่มใหม่?</h2><p>หมู่บ้านและบัตรความรู้ของ'+esc(R.name)+'ในโหมดนี้จะถูกล้าง</p>',[
+    {label:"ล้างและเริ่มใหม่",fn:function(){if(state.mode==="mission")startMission(state.region,state.mid);else startFree(state.region,true);}},
+    {label:"ยกเลิก",ghost:true}]);
+});
+if(LICENSEE)$("foot").textContent="ลิขสิทธิ์ นายพลพิพัฒน์ ทิพยไชย และเพจสื่อและแผน ผู้ได้รับสิทธิ์ใช้งาน: "+LICENSEE;
+})();
+</script>
+</body>
+</html>
